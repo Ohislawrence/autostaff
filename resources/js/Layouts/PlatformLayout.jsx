@@ -13,21 +13,21 @@ export default function PlatformLayout({ children, title }) {
     const { auth, flash } = usePage().props;
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-amber-50">
-            <nav className="bg-white/80 backdrop-blur-md border-b border-blue-100 px-6 py-3 flex items-center justify-between shadow-sm">
-                <span className="text-lg font-bold bg-gradient-to-r from-blue-700 to-blue-900 bg-clip-text text-transparent">🤖 AI Employee — Platform Admin</span>
+        <div className="min-h-screen bg-bone font-sans text-ink">
+            <nav className="bg-bone/85 backdrop-blur-md border-b border-ink/10 px-6 py-3 flex items-center justify-between">
+                <span className="flex items-center gap-2"><img src="/images/nomdal-favicon.png" alt="Nomdal" className="h-7 w-7 object-contain" /><span className="font-display text-lg font-black tracking-tight text-ink">Nomdal — Platform Admin</span></span>
                 <div className="flex items-center gap-3">
-                    <span className="text-sm text-gray-700">{auth.user?.name} <span className="px-2 py-0.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded text-xs font-medium shadow-sm">Platform Owner</span></span>
-                    <form method="POST" action="/logout"><input type="hidden" name="_token" value={document.querySelector('meta[name="csrf-token"]')?.content} /><button className="text-sm text-gray-600 hover:text-blue-700 font-medium">Logout</button></form>
+                    <span className="text-sm text-ink-dim">{auth.user?.name} <span className="px-2 py-0.5 bg-lime/20 text-forest rounded text-xs font-bold">Platform Owner</span></span>
+                    <form method="POST" action="/logout"><input type="hidden" name="_token" value={document.querySelector('meta[name="csrf-token"]')?.content} /><button className="text-sm text-ink-dim hover:text-ink font-semibold">Logout</button></form>
                 </div>
             </nav>
             <div className="flex">
-                <aside className="w-56 bg-white/90 backdrop-blur-md border-r border-blue-100 min-h-[calc(100vh-57px)] p-3 overflow-y-auto shadow-xl shadow-blue-100/20">
+                <aside className="w-56 bg-white/70 backdrop-blur-md border-r border-ink/10 min-h-[calc(100vh-57px)] p-3 overflow-y-auto">
                     {sidebar.map(section => (
                         <div key={section.section} className="mb-4">
-                            <p className="px-3 text-xs font-bold text-blue-400 uppercase tracking-wider mb-2">{section.section}</p>
+                            <p className="px-3 font-mono text-[11px] font-bold text-ink-faint uppercase tracking-wider mb-2">{section.section}</p>
                             {section.items.map(item => (
-                                <Link key={item.name} href={item.href} className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm mb-1 transition-all ${window.location.pathname === item.href ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium shadow-md shadow-blue-200' : 'text-gray-600 hover:bg-blue-50 hover:text-blue-700'}`}>
+                                <Link key={item.name} href={item.href} className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm mb-1 font-semibold transition-all ${window.location.pathname === item.href ? 'bg-ink text-bone' : 'text-ink-dim hover:bg-white/70 hover:text-ink'}`}>
                                     <span>{item.icon}</span> {item.name}
                                 </Link>
                             ))}
@@ -36,8 +36,8 @@ export default function PlatformLayout({ children, title }) {
                 </aside>
                 <main className="flex-1 p-8">
                     <Head title={title || 'Platform'} />
-                    {flash?.success && <div className="mb-4 p-4 bg-green-50 text-green-700 rounded-lg text-sm">{flash.success}</div>}
-                    {flash?.error && <div className="mb-4 p-4 bg-red-50 text-red-700 rounded-lg text-sm">{flash.error}</div>}
+                    {flash?.success && <div className="mb-4 p-4 bg-lime/10 text-forest rounded-xl border border-lime/40 text-sm">{flash.success}</div>}
+                    {flash?.error && <div className="mb-4 p-4 bg-wine/10 text-wine rounded-xl border border-wine/40 text-sm">{flash.error}</div>}
                     {children}
                 </main>
             </div>

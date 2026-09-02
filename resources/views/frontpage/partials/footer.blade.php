@@ -3,9 +3,7 @@
         <div class="grid grid-cols-2 gap-10 md:grid-cols-5">
             <div class="col-span-2">
                 <div class="flex items-center gap-2.5">
-                    <span class="flex h-7 w-7 items-center justify-center rounded-full bg-ink">
-                        <span class="font-display text-xs font-black text-bone">N</span>
-                    </span>
+                    <img src="{{ asset('images/nomdal-favicon.png') }}" alt="Nomdal" class="h-7 w-7 object-contain" />
                     <span class="font-display text-base font-black text-ink">Nomdal</span>
                 </div>
                 <p class="mt-4 max-w-xs text-sm leading-relaxed text-ink-dim">

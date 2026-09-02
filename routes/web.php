@@ -85,11 +85,28 @@ Route::get('/prospecting/unsubscribe/{token}', [\App\Http\Controllers\Unsubscrib
 Route::middleware('guest')->group(function () {
     Route::get('/login', fn () => inertia('Auth/Login'))->name('login');
     Route::post('/login', [\App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'store']);
+
+    // Registration
+    Route::get('/register', [\App\Http\Controllers\Auth\RegisteredUserController::class, 'create'])->name('register');
+    Route::post('/register', [\App\Http\Controllers\Auth\RegisteredUserController::class, 'store']);
+
+    // Password reset
+    Route::get('/forgot-password', [\App\Http\Controllers\Auth\PasswordResetLinkController::class, 'create'])->name('password.request');
+    Route::post('/forgot-password', [\App\Http\Controllers\Auth\PasswordResetLinkController::class, 'store'])->name('password.email');
+    Route::get('/reset-password/{token}', [\App\Http\Controllers\Auth\NewPasswordController::class, 'create'])->name('password.reset');
+    Route::post('/reset-password', [\App\Http\Controllers\Auth\NewPasswordController::class, 'store'])->name('password.store');
 });
 
-// Authenticated routes (all users need to be logged in)
+// Email verification (authenticated but not yet verified)
 Route::middleware(['auth'])->group(function () {
     Route::post('/logout', [\App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'destroy'])->name('logout');
+    Route::get('/verify-email', [\App\Http\Controllers\Auth\EmailVerificationPromptController::class, '__invoke'])->name('verification.notice');
+    Route::get('/verify-email/{id}/{hash}', [\App\Http\Controllers\Auth\VerifyEmailController::class, '__invoke'])->middleware('signed')->name('verification.verify');
+    Route::post('/email/verification-notification', [\App\Http\Controllers\Auth\EmailVerificationNotificationController::class, 'store'])->middleware('throttle:6,1')->name('verification.send');
+});
+
+// Authenticated + verified routes
+Route::middleware(['auth', 'verified'])->group(function () {
 
     // Platform Owner routes (no tenant required)
     Route::middleware('role:Platform Owner')->group(function () {

@@ -3,16 +3,17 @@ import { Head, Link, useForm } from '@inertiajs/react';
 const inputClass =
     'w-full rounded-xl border border-ink/15 bg-white/70 px-4 py-2.5 text-sm text-ink outline-none transition placeholder:text-ink-faint focus:border-ink/40 focus:ring-2 focus:ring-periwinkle/30';
 
-export default function Login({ status }) {
+export default function ResetPassword({ email, token }) {
     const { data, setData, post, processing, errors } = useForm({
-        email: '',
+        token,
+        email: email || '',
         password: '',
-        remember: false,
+        password_confirmation: '',
     });
 
-    const handleSubmit = (e) => {
+    const submit = (e) => {
         e.preventDefault();
-        post('/login');
+        post('/reset-password');
     };
 
     return (
@@ -23,7 +24,7 @@ export default function Login({ status }) {
                 <div className="absolute bottom-0 left-1/3 h-[22rem] w-[22rem] rounded-full bg-citron/50 blur-[110px]" />
             </div>
 
-            <Head title="Sign In" />
+            <Head title="Reset Password" />
 
             <div className="relative flex min-h-screen items-center justify-center px-4 py-12">
                 <div className="w-full max-w-md">
@@ -32,15 +33,11 @@ export default function Login({ status }) {
                             <img src="/images/nomdal-favicon.png" alt="Nomdal" className="h-12 w-12 object-contain" />
                         </Link>
                         <h1 className="mt-4 font-display text-2xl font-black tracking-tight text-ink">Nomdal</h1>
-                        <p className="mt-1 text-sm text-ink-dim">Sign in to your account</p>
+                        <p className="mt-1 text-sm text-ink-dim">Set a new password</p>
                     </div>
 
-                    {status && (
-                        <div className="mb-4 rounded-xl border border-lime/40 bg-lime/10 px-4 py-3 text-sm text-forest">{status}</div>
-                    )}
-
                     <div className="rounded-3xl border border-ink/10 bg-white/60 p-8 shadow-sm backdrop-blur">
-                        <form onSubmit={handleSubmit} className="space-y-5">
+                        <form onSubmit={submit} className="space-y-5">
                             <div>
                                 <label htmlFor="email" className="mb-1 block text-sm font-semibold text-ink">
                                     Email address
@@ -60,7 +57,7 @@ export default function Login({ status }) {
 
                             <div>
                                 <label htmlFor="password" className="mb-1 block text-sm font-semibold text-ink">
-                                    Password
+                                    New password
                                 </label>
                                 <input
                                     id="password"
@@ -68,25 +65,25 @@ export default function Login({ status }) {
                                     value={data.password}
                                     onChange={(e) => setData('password', e.target.value)}
                                     className={inputClass}
-                                    placeholder="••••••••"
+                                    placeholder="At least 8 characters"
                                     required
                                 />
                                 {errors.password && <p className="mt-1 text-xs text-wine">{errors.password}</p>}
                             </div>
 
-                            <div className="flex items-center justify-between">
-                                <label className="flex items-center gap-2 text-sm text-ink-dim">
-                                    <input
-                                        type="checkbox"
-                                        checked={data.remember}
-                                        onChange={(e) => setData('remember', e.target.checked)}
-                                        className="h-4 w-4 rounded border-ink/30 accent-forest"
-                                    />
-                                    Remember me
+                            <div>
+                                <label htmlFor="password_confirmation" className="mb-1 block text-sm font-semibold text-ink">
+                                    Confirm password
                                 </label>
-                                <Link href="/forgot-password" className="text-sm font-semibold text-forest hover:underline">
-                                    Forgot password?
-                                </Link>
+                                <input
+                                    id="password_confirmation"
+                                    type="password"
+                                    value={data.password_confirmation}
+                                    onChange={(e) => setData('password_confirmation', e.target.value)}
+                                    className={inputClass}
+                                    placeholder="Repeat your password"
+                                    required
+                                />
                             </div>
 
                             <button
@@ -94,15 +91,14 @@ export default function Login({ status }) {
                                 disabled={processing}
                                 className="w-full rounded-full bg-ink px-4 py-3 text-sm font-bold text-bone transition hover:bg-forest disabled:cursor-not-allowed disabled:opacity-50"
                             >
-                                {processing ? 'Signing in...' : 'Sign in'}
+                                {processing ? 'Resetting...' : 'Reset password'}
                             </button>
                         </form>
                     </div>
 
                     <p className="mt-6 text-center text-sm text-ink-dim">
-                        Don&apos;t have an account?{' '}
-                        <Link href="/register" className="font-semibold text-forest hover:underline">
-                            Start free
+                        <Link href="/login" className="font-semibold text-forest hover:underline">
+                            Back to sign in
                         </Link>
                     </p>
                 </div>

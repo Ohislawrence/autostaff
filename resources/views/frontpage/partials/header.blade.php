@@ -6,7 +6,7 @@
 >
     <div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
         <a href="{{ route('frontpage.home') }}" class="group flex items-center gap-2.5">
-            <span class="flex h-8 w-8 items-center justify-center rounded-full bg-ink font-display text-sm font-black text-bone">N</span>
+            <img src="{{ asset('images/nomdal-favicon.png') }}" alt="Nomdal" class="h-8 w-8 object-contain" />
             <span class="font-display text-lg font-black tracking-tight text-ink">Nomdal</span>
         </a>
 

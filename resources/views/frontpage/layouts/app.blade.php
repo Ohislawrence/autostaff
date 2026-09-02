@@ -16,7 +16,7 @@
     <meta property="og:title" content="@yield('title', 'Nomdal — AI Employees for Your Business')">
     <meta property="og:description" content="@yield('meta_description', 'Nomdal builds AI employees that handle conversations, orders, appointments, and follow-ups — built for businesses in Nigeria and everywhere else.')">
     <meta property="og:url" content="{{ url()->current() }}">
-    <meta property="og:image" content="{{ url('/images/og-image.png') }}">
+    <meta property="og:image" content="{{ url('/images/og-image.jpeg') }}">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
 
@@ -24,11 +24,11 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="@yield('title', 'Nomdal — AI Employees for Your Business')">
     <meta name="twitter:description" content="@yield('meta_description', 'Nomdal builds AI employees that handle conversations, orders, appointments, and follow-ups — built for businesses in Nigeria and everywhere else.')">
-    <meta name="twitter:image" content="{{ url('/images/og-image.png') }}">
+    <meta name="twitter:image" content="{{ url('/images/og-image.jpeg') }}">
 
     <meta name="theme-color" content="#e8ebff">
 
-    <link rel="icon" href="{{ asset('favicon.ico') }}">
+    <link rel="icon" href="{{ asset('images/nomdal-favicon.png') }}">
 
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=archivo:500,600,700,800,900|inter:400,500,600|jetbrains-mono:400,500" rel="stylesheet" />
@@ -135,7 +135,7 @@
         "@@type": "Organization",
         "name": "Nomdal",
         "url": "{{ url('/') }}",
-        "logo": "{{ url('/images/og-image.png') }}",
+        "logo": "{{ url('/images/nomdal-favicon.png') }}",
         "email": "hello@nomdal.com",
         "telephone": "+2349022239628",
         "address": { "@@type": "PostalAddress", "addressLocality": "Lagos", "addressCountry": "NG" }

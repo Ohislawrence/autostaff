@@ -24,9 +24,32 @@
     --color-accent-900: #78350f;
 
     --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+    /* Editorial brand tokens (frontpage) */
+    --font-display: 'Archivo', ui-sans-serif, system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+
+    --color-bone: #fbf7ef;
+    --color-purple: #e8ebff;
+    --color-periwinkle: #899bff;
+    --color-periwinkle-600: #6f83f2;
+    --color-periwinkle-700: #5a6fe0;
+    --color-lime: #3ab91a;
+    --color-citron: #caeb65;
+    --color-blush: #f5b2bd;
+    --color-peach: #ffc4ac;
+    --color-forest: #2a5b40;
+    --color-wine: #63252f;
+    --color-rust: #cf530b;
+    --color-sand: #c3b591;
+    --color-ltbeige: #ebe3d4;
+    --color-ink: #1a1a1a;
+    --color-ink-dim: #55504a;
+    --color-ink-faint: #8a857c;
 }
 
 body {
     font-family: var(--font-sans);
-    background: linear-gradient(135deg, #eff6ff 0%, #f8fafc 100%);
+    background: #fbf7ef;
+    color: #1a1a1a;
 }

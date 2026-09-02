@@ -78,8 +78,8 @@ export default function TenantLayout({ children, header }) {
     }).filter(section => section.items.length > 0);
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-amber-50">
-            <nav className="fixed top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-blue-100 shadow-sm">
+        <div className="min-h-screen bg-bone font-sans text-ink">
+            <nav className="fixed top-0 z-50 w-full bg-bone/85 backdrop-blur-md border-b border-ink/10">
                 <div className="px-4 py-3 lg:px-6">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
@@ -89,12 +89,8 @@ export default function TenantLayout({ children, header }) {
                                 </svg>
                             </button>
                             <Link href="/dashboard" className="flex items-center gap-2">
-                                <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center shadow-md shadow-blue-200">
-                                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5" />
-                                    </svg>
-                                </div>
-                                <span className="text-lg font-bold bg-gradient-to-r from-blue-700 to-blue-900 bg-clip-text text-transparent">{auth.organization?.name || 'AI Employee'}</span>
+                                <img src="/images/nomdal-favicon.png" alt="Nomdal" className="w-8 h-8 object-contain" />
+                                <span className="font-display text-lg font-black tracking-tight text-ink">{auth.organization?.name || 'Nomdal'}</span>
                             </Link>
                         </div>
                         <div className="flex items-center gap-3">
@@ -166,29 +162,29 @@ export default function TenantLayout({ children, header }) {
                             <span className="text-sm text-gray-700 hidden sm:block">
                                 {auth.user?.name}
                                 {auth.user?.roles?.length > 0 && (
-                                    <span className="ml-1 px-2 py-0.5 bg-gradient-to-r from-amber-400 to-amber-500 text-white rounded text-xs font-medium shadow-sm">
+                                    <span className="ml-1 px-2 py-0.5 bg-lime/20 text-forest rounded text-xs font-bold">
                                         {auth.user.roles[0]}
                                     </span>
                                 )}
                             </span>
-                            <Link href="/logout" method="post" as="button" className="text-sm text-gray-600 hover:text-blue-700 font-medium transition-colors">Logout</Link>
+                            <Link href="/logout" method="post" as="button" className="text-sm text-ink-dim hover:text-ink font-semibold transition-colors">Logout</Link>
                         </div>
                     </div>
                 </div>
             </nav>
 
-            <aside className={`fixed top-0 left-0 z-40 w-64 h-screen pt-16 transition-transform bg-white/90 backdrop-blur-md border-r border-blue-100 lg:translate-x-0 shadow-xl shadow-blue-100/20 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+            <aside className={`fixed top-0 left-0 z-40 w-64 h-screen pt-16 transition-transform bg-white/70 backdrop-blur-md border-r border-ink/10 lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
                 <div className="h-full px-3 pb-4 overflow-y-auto">
                     {filteredSections.map(section => (
                         <div key={section.section} className="mb-4">
-                            <p className="px-3 text-xs font-bold text-blue-400 uppercase tracking-wider mb-2">{section.section}</p>
+                            <p className="px-3 font-mono text-[11px] font-bold text-ink-faint uppercase tracking-wider mb-2">{section.section}</p>
                             <ul className="space-y-1 font-medium">
                                 {section.items.map((item) => {
                                     const isActive = window.location.pathname.startsWith(item.href);
                                     return (
                                         <li key={item.name}>
-                                            <Link href={item.href} className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all ${isActive ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md shadow-blue-200' : 'text-gray-700 hover:bg-blue-50 hover:text-blue-700'}`}>
-                                                <item.icon className={`w-5 h-5 ${isActive ? 'text-white' : 'text-gray-400'}`} />
+                                            <Link href={item.href} className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold transition-all ${isActive ? 'bg-ink text-bone' : 'text-ink-dim hover:bg-white/70 hover:text-ink'}`}>
+                                                <item.icon className={`w-5 h-5 ${isActive ? 'text-lime' : 'text-ink-faint'}`} />
                                                 {item.name}
                                             </Link>
                                         </li>
@@ -200,11 +196,11 @@ export default function TenantLayout({ children, header }) {
                 </div>
             </aside>
 
-            {sidebarOpen && <div className="fixed inset-0 z-30 bg-gray-900/50 lg:hidden" onClick={() => setSidebarOpen(false)} />}
+            {sidebarOpen && <div className="fixed inset-0 z-30 bg-ink/50 lg:hidden" onClick={() => setSidebarOpen(false)} />}
 
             <div className="lg:pl-64 pt-16">
                 <main className="p-4 lg:p-8">
-                    {header && (<div className="mb-6"><h1 className="text-2xl font-bold text-gray-900">{header}</h1></div>)}
+                    {header && (<div className="mb-6"><h1 className="font-display text-2xl font-black tracking-tight text-ink">{header}</h1></div>)}
                     {children}
                 </main>
             </div>
