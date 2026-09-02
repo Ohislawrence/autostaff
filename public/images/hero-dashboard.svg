@@ -1,0 +1,83 @@
+<svg width="640" height="520" viewBox="0 0 640 520" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="brand" x1="0" y1="0" x2="640" y2="0" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#7C5CFF"/>
+      <stop offset="1" stop-color="#35E8FF"/>
+    </linearGradient>
+    <linearGradient id="brandv" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#9A8CFF"/>
+      <stop offset="1" stop-color="#6A47F2"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0" r="0.7">
+      <stop stop-color="#7C5CFF" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#7C5CFF" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="640" height="520" rx="28" fill="#10101F"/>
+  <rect x="1" y="1" width="638" height="518" rx="27" stroke="#FFFFFF" stroke-opacity="0.1"/>
+
+  <!-- window header -->
+  <rect x="0" y="0" width="640" height="54" rx="28" fill="#161629"/>
+  <rect x="0" y="28" width="640" height="26" fill="#161629"/>
+  <circle cx="30" cy="27" r="5" fill="#FF6B6B"/>
+  <circle cx="50" cy="27" r="5" fill="#FFB84D"/>
+  <circle cx="70" cy="27" r="5" fill="#35E8FF"/>
+  <rect x="200" y="14" width="240" height="26" rx="13" fill="#1C1C33" stroke="#FFFFFF" stroke-opacity="0.06"/>
+  <text x="218" y="31" fill="#B8B8CC" font-family="Inter, sans-serif" font-size="12">Nomdal · Receptionist</text>
+  <circle cx="600" cy="27" r="4" fill="#35E8FF"/>
+  <text x="612" y="31" fill="#6FF0FF" font-family="Inter, sans-serif" font-size="11">live</text>
+
+  <!-- chat area -->
+  <rect x="28" y="76" width="584" height="330" rx="18" fill="#0A0A1A" stroke="#FFFFFF" stroke-opacity="0.05"/>
+
+  <!-- customer message -->
+  <rect x="320" y="100" width="250" height="52" rx="14" fill="#1C1C33"/>
+  <text x="338" y="122" fill="#F5F5FA" font-family="Inter, sans-serif" font-size="13">Hi! Do you have time on</text>
+  <text x="338" y="140" fill="#F5F5FA" font-family="Inter, sans-serif" font-size="13">Monday for a consultation?</text>
+
+  <!-- AI message -->
+  <rect x="52" y="176" width="300" height="68" rx="14" fill="#161629"/>
+  <rect x="52" y="176" width="8" height="68" rx="4" fill="url(#brandv)"/>
+  <text x="76" y="198" fill="#9A8CFF" font-family="Inter, sans-serif" font-size="11" font-weight="600">Nomdal AI</text>
+  <text x="76" y="218" fill="#F5F5FA" font-family="Inter, sans-serif" font-size="13">Yes! I have 9:00 and 10:30</text>
+  <text x="76" y="236" fill="#F5F5FA" font-family="Inter, sans-serif" font-size="13">available. Shall I book 9:00?</text>
+
+  <!-- customer message -->
+  <rect x="320" y="266" width="180" height="38" rx="14" fill="#1C1C33"/>
+  <text x="338" y="289" fill="#F5F5FA" font-family="Inter, sans-serif" font-size="13">Perfect, book it 👍</text>
+
+  <!-- AI confirmation card -->
+  <rect x="52" y="330" width="300" height="60" rx="14" fill="#10101F" stroke="#7C5CFF" stroke-opacity="0.4"/>
+  <circle cx="78" cy="360" r="14" fill="#7C5CFF" fill-opacity="0.2"/>
+  <path d="M72 360l4 4 7-8" stroke="#9A8CFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="102" y="353" fill="#F5F5FA" font-family="Inter, sans-serif" font-size="13" font-weight="600">Appointment confirmed</text>
+  <text x="102" y="373" fill="#B8B8CC" font-family="Inter, sans-serif" font-size="12">Monday · 9:00 – 9:30</text>
+
+  <!-- input bar -->
+  <rect x="28" y="422" width="584" height="48" rx="24" fill="#161629" stroke="#FFFFFF" stroke-opacity="0.08"/>
+  <text x="52" y="452" fill="#6E6E8A" font-family="Inter, sans-serif" font-size="13">Type a message…</text>
+  <circle cx="588" cy="446" r="16" fill="url(#brand)"/>
+  <path d="M581 446l10 0m-10 0l0-4 8 4-8 4z" fill="#060613"/>
+
+  <!-- floating stat cards -->
+  <g>
+    <rect x="470" y="66" width="146" height="0" fill="none"/>
+  </g>
+  <rect x="472" y="64" width="146" height="120" rx="16" fill="#161629" stroke="#FFFFFF" stroke-opacity="0.08"/>
+  <rect x="472" y="64" width="146" height="120" rx="16" fill="url(#glow)" opacity="0.5"/>
+  <text x="490" y="92" fill="#6E6E8A" font-family="Inter, sans-serif" font-size="11">Appointments</text>
+  <text x="490" y="122" fill="#F5F5FA" font-family="Inter, sans-serif" font-size="24" font-weight="700">128</text>
+  <text x="490" y="142" fill="#35E8FF" font-family="Inter, sans-serif" font-size="11">+18% this week</text>
+  <circle cx="490" cy="164" r="4" fill="#35E8FF"/>
+
+  <rect x="472" y="196" width="146" height="120" rx="16" fill="#161629" stroke="#FFFFFF" stroke-opacity="0.08"/>
+  <text x="490" y="224" fill="#6E6E8A" font-family="Inter, sans-serif" font-size="11">Conversations</text>
+  <text x="490" y="254" fill="#F5F5FA" font-family="Inter, sans-serif" font-size="24" font-weight="700">1,204</text>
+  <text x="490" y="274" fill="#9A8CFF" font-family="Inter, sans-serif" font-size="11">resolved 24/7</text>
+  <circle cx="490" cy="296" r="4" fill="#9A8CFF"/>
+
+  <!-- bottom brand bar -->
+  <rect x="0" y="488" width="640" height="32" rx="28" fill="#0A0A1A"/>
+  <rect x="0" y="504" width="640" height="16" fill="#0A0A1A"/>
+</svg>

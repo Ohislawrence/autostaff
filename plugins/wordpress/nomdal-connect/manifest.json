@@ -1,0 +1,9 @@
+{
+  "plugin_id": "nomdal-connect",
+  "name": "Nomdal Connect",
+  "version": "1.0.0",
+  "target_platform": "wordpress",
+  "min_api_version": "1.0",
+  "max_api_version": "1.0",
+  "requires_wp": "5.6"
+}
