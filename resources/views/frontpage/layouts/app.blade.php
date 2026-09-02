@@ -7,122 +7,154 @@
 
     <title>@yield('title', 'Nomdal — AI Employees for Your Business')</title>
     <meta name="description" content="@yield('meta_description', 'Nomdal builds AI employees that handle conversations, orders, appointments, and follow-ups — built for businesses in Nigeria and everywhere else.')">
-    <meta property="og:title" content="@yield('og_title', 'Nomdal — AI Employees for Your Business')">
-    <meta property="og:description" content="@yield('og_description', 'AI employees that work your front desk, sales, and support — 24/7.')">
+    <link rel="canonical" href="{{ url()->current() }}">
+
+    {{-- Open Graph --}}
     <meta property="og:type" content="website">
-    <meta name="theme-color" content="#060613">
+    <meta property="og:site_name" content="Nomdal">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:title" content="@yield('title', 'Nomdal — AI Employees for Your Business')">
+    <meta property="og:description" content="@yield('meta_description', 'Nomdal builds AI employees that handle conversations, orders, appointments, and follow-ups — built for businesses in Nigeria and everywhere else.')">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:image" content="{{ url('/images/og-image.png') }}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+
+    {{-- Twitter --}}
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="@yield('title', 'Nomdal — AI Employees for Your Business')">
+    <meta name="twitter:description" content="@yield('meta_description', 'Nomdal builds AI employees that handle conversations, orders, appointments, and follow-ups — built for businesses in Nigeria and everywhere else.')">
+    <meta name="twitter:image" content="{{ url('/images/og-image.png') }}">
+
+    <meta name="theme-color" content="#e8ebff">
 
     <link rel="icon" href="{{ asset('favicon.ico') }}">
 
     <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700,800|jetbrains-mono:400,500,600" rel="stylesheet" />
-    <link href="https://api.fontshare.com/v2/css?f[]=clash-display@500,600,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.bunny.net/css?family=archivo:500,600,700,800,900|inter:400,500,600|jetbrains-mono:400,500" rel="stylesheet" />
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
     <script>
         tailwind.config = {
-            darkMode: 'class',
             theme: {
                 extend: {
                     fontFamily: {
-                        display: ['"Clash Display"', 'Inter', 'ui-sans-serif', 'system-ui'],
+                        display: ['"Archivo"', 'Inter', 'ui-sans-serif', 'system-ui'],
                         sans: ['Inter', 'ui-sans-serif', 'system-ui'],
                         mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular'],
                     },
                     colors: {
-                        void: { DEFAULT: '#060613', 50: '#0A0A1A', 100: '#10101F' },
-                        surface: { DEFAULT: '#10101F', 50: '#161629', 100: '#1C1C33' },
-                        violet: { 400: '#9A8CFF', 500: '#7C5CFF', 600: '#6A47F2', 900: '#241A66' },
-                        cyan: { 400: '#6FF0FF', 500: '#35E8FF', 600: '#1FC7DE' },
-                        amber: { 400: '#FFC978', 500: '#FFB84D', 600: '#F2A02E' },
-                        ink: { DEFAULT: '#F5F5FA', dim: '#B8B8CC', faint: '#6E6E8A' },
-                    },
-                    boxShadow: {
-                        glow: '0 0 40px -8px rgba(124,92,255,0.45)',
-                        'glow-cyan': '0 0 40px -8px rgba(53,232,255,0.35)',
+                        bone: '#fbf7ef',
+                        purple: '#e8ebff',
+                        periwinkle: { DEFAULT: '#899bff', 600: '#6f83f2', 700: '#5a6fe0' },
+                        lime: '#3ab91a',
+                        citron: '#caeb65',
+                        blush: '#f5b2bd',
+                        peach: '#ffc4ac',
+                        forest: '#2a5b40',
+                        wine: '#63252f',
+                        rust: '#cf530b',
+                        sand: '#c3b591',
+                        ltbeige: '#ebe3d4',
+                        ink: { DEFAULT: '#1a1a1a', dim: '#55504a', faint: '#8a857c' },
                     },
                     keyframes: {
                         drift: {
                             '0%, 100%': { transform: 'translate(0, 0) scale(1)' },
-                            '50%': { transform: 'translate(3%, -4%) scale(1.05)' },
+                            '50%': { transform: 'translate(4%, -5%) scale(1.06)' },
                         },
-                        pulseLine: {
-                            '0%': { strokeDashoffset: '240', opacity: '0' },
-                            '15%': { opacity: '1' },
-                            '80%': { opacity: '1' },
-                            '100%': { strokeDashoffset: '0', opacity: '0' },
-                        },
-                        nodePulse: {
-                            '0%, 100%': { transform: 'scale(1)', opacity: '0.6' },
-                            '50%': { transform: 'scale(1.6)', opacity: '0' },
+                        radiate: {
+                            '0%': { transform: 'scale(1)', opacity: '1' },
+                            '100%': { transform: 'scale(2.4)', opacity: '0' },
                         },
                         ticker: {
                             '0%': { transform: 'translateX(0)' },
                             '100%': { transform: 'translateX(-50%)' },
                         },
-                        rise: {
-                            '0%': { opacity: '0', transform: 'translateY(14px)' },
-                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-18px)' },
+                        },
+                        spinSlow: {
+                            '0%': { transform: 'rotate(0deg)' },
+                            '100%': { transform: 'rotate(360deg)' },
                         },
                     },
                     animation: {
-                        drift: 'drift 18s ease-in-out infinite',
-                        'drift-slow': 'drift 26s ease-in-out infinite reverse',
-                        'pulse-line': 'pulseLine 3.5s ease-in-out infinite',
-                        'node-pulse': 'nodePulse 2.4s ease-out infinite',
-                        ticker: 'ticker 32s linear infinite',
-                        rise: 'rise 0.7s cubic-bezier(0.16,1,0.3,1) both',
+                        drift: 'drift 20s ease-in-out infinite',
+                        'drift-slow': 'drift 28s ease-in-out infinite reverse',
+                        radiate: 'radiate 2.6s cubic-bezier(0.16, 1, 0.3, 1) infinite',
+                        ticker: 'ticker 36s linear infinite',
+                        float: 'float 7s ease-in-out infinite',
+                        'spin-slow': 'spinSlow 45s linear infinite',
                     },
                 },
             },
         };
     </script>
 
+    
+
     <style>
-        @media (prefers-reduced-motion: reduce) {
-            *, *::before, *::after {
-                animation-duration: 0.001ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 0.001ms !important;
-            }
-        }
+        html { background: #e8ebff; }
+        body { background: #fbf7ef; }
 
-        html { background: #060613; }
+        [x-cloak] { display: none !important; }
 
-        .bg-grid {
-            background-image: radial-gradient(rgba(124,92,255,0.16) 1px, transparent 1px);
-            background-size: 28px 28px;
-        }
+        ::selection { background: #3ab91a; color: #1a1a1a; }
 
-        .bg-fade {
-            -webkit-mask-image: linear-gradient(to bottom, black, black 60%, transparent 100%);
-            mask-image: linear-gradient(to bottom, black, black 60%, transparent 100%);
-        }
+        .reveal { opacity: 0; transform: translateY(28px); transition: opacity .7s cubic-bezier(.16,1,.3,1), transform .7s cubic-bezier(.16,1,.3,1); will-change: opacity, transform; }
+        .reveal.on { opacity: 1; transform: translateY(0); }
 
-        .ticker-track { animation: ticker 32s linear infinite; }
+        .ticker-track { animation: ticker 36s linear infinite; }
         .ticker-track:hover { animation-play-state: paused; }
 
-        ::selection { background: #7C5CFF; color: #060613; }
+        .link-underline { position: relative; }
+        .link-underline::after { content: ''; position: absolute; left: 0; bottom: -3px; height: 2px; width: 100%; background: currentColor; transform: scaleX(0); transform-origin: right; transition: transform .3s cubic-bezier(.45,0,.55,1); }
+        .link-underline:hover::after { transform: scaleX(1); transform-origin: left; }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+            .reveal { opacity: 1 !important; transform: none !important; }
+        }
 
         ::-webkit-scrollbar { width: 10px; }
-        ::-webkit-scrollbar-track { background: #0A0A1A; }
-        ::-webkit-scrollbar-thumb { background: #241A66; border-radius: 999px; }
-        ::-webkit-scrollbar-thumb:hover { background: #6A47F2; }
+        ::-webkit-scrollbar-track { background: #e8ebff; }
+        ::-webkit-scrollbar-thumb { background: #c3b591; border-radius: 999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #899bff; }
 
-        :focus-visible {
-            outline: 2px solid #35E8FF;
-            outline-offset: 3px;
-            border-radius: 4px;
-        }
+        :focus-visible { outline: 2px solid #63252f; outline-offset: 3px; border-radius: 4px; }
     </style>
+
+    {{-- Structured data --}}
+    <script type="application/ld+json">
+    {
+        "@@context": "https://schema.org",
+        "@@type": "Organization",
+        "name": "Nomdal",
+        "url": "{{ url('/') }}",
+        "logo": "{{ url('/images/og-image.png') }}",
+        "email": "hello@nomdal.com",
+        "telephone": "+2349022239628",
+        "address": { "@@type": "PostalAddress", "addressLocality": "Lagos", "addressCountry": "NG" }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+        "@@context": "https://schema.org",
+        "@@type": "WebSite",
+        "name": "Nomdal",
+        "url": "{{ url('/') }}"
+    }
+    </script>
 </head>
-<body class="min-h-screen bg-void font-sans text-ink antialiased">
-    <div class="pointer-events-none fixed inset-0 -z-10 bg-grid bg-fade">
-        <div class="absolute -top-32 -left-20 h-[32rem] w-[32rem] rounded-full bg-violet-600/25 blur-[120px] animate-drift"></div>
-        <div class="absolute top-1/3 -right-32 h-[28rem] w-[28rem] rounded-full bg-cyan-500/15 blur-[130px] animate-drift-slow"></div>
-        <div class="absolute bottom-0 left-1/4 h-[24rem] w-[24rem] rounded-full bg-amber-500/10 blur-[120px] animate-drift"></div>
+<body class="min-h-screen bg-bone font-sans text-ink antialiased">
+    <div class="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+        <div class="absolute -top-40 -left-24 h-[30rem] w-[30rem] rounded-full bg-blush/50 blur-[120px] animate-drift"></div>
+        <div class="absolute top-1/4 -right-32 h-[26rem] w-[26rem] rounded-full bg-periwinkle/40 blur-[120px] animate-drift-slow"></div>
+        <div class="absolute bottom-0 left-1/3 h-[22rem] w-[22rem] rounded-full bg-citron/50 blur-[110px] animate-drift"></div>
     </div>
 
     @include('frontpage.partials.header')
@@ -132,5 +164,22 @@
     </main>
 
     @include('frontpage.partials.footer')
+
+    <script>
+        (function () {
+            var els = document.querySelectorAll('.reveal');
+            if (!('IntersectionObserver' in window)) { els.forEach(function (el) { el.classList.add('on'); }); return; }
+            var io = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
+                    if (entry.isIntersecting) { entry.target.classList.add('on'); io.unobserve(entry.target); }
+                });
+            }, { threshold: 0.12, rootMargin: '0px 0px -48px 0px' });
+            els.forEach(function (el) {
+                var d = el.getAttribute('data-reveal-delay');
+                if (d) { el.style.transitionDelay = d + 'ms'; }
+                io.observe(el);
+            });
+        })();
+    </script>
 </body>
 </html>

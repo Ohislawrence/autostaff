@@ -44,6 +44,40 @@ Route::get('/marketplace', function () {
     return view('frontpage.marketplace', ['plugins' => $plugins]);
 })->name('frontpage.marketplace');
 
+// SEO: sitemap.xml
+Route::get('/sitemap.xml', function () {
+    $pages = [
+        ['/', '1.0', 'weekly'],
+        ['/product', '0.9', 'weekly'],
+        ['/templates', '0.9', 'weekly'],
+        ['/pricing', '1.0', 'weekly'],
+        ['/docs', '0.6', 'monthly'],
+        ['/connect', '0.7', 'monthly'],
+        ['/about', '0.5', 'monthly'],
+        ['/services', '0.7', 'monthly'],
+        ['/contact', '0.7', 'monthly'],
+        ['/marketplace', '0.8', 'weekly'],
+        ['/privacy', '0.1', 'yearly'],
+        ['/terms', '0.1', 'yearly'],
+    ];
+
+    $base = rtrim(url('/'), '/');
+
+    $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+    $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+    foreach ($pages as [$path, $priority, $changefreq]) {
+        $xml .= '  <url>' . "\n"
+            . '    <loc>' . e($base . $path) . '</loc>' . "\n"
+            . '    <lastmod>' . now()->toDateString() . '</lastmod>' . "\n"
+            . '    <changefreq>' . $changefreq . '</changefreq>' . "\n"
+            . '    <priority>' . $priority . '</priority>' . "\n"
+            . '  </url>' . "\n";
+    }
+    $xml .= '</urlset>';
+
+    return response($xml, 200, ['Content-Type' => 'application/xml']);
+})->name('sitemap.xml');
+
 // Public unsubscribe (one-click opt-out — no auth required)
 Route::get('/prospecting/unsubscribe/{token}', [\App\Http\Controllers\UnsubscribeController::class, '__invoke'])->name('prospecting.unsubscribe');
 
