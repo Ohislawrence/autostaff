@@ -129,20 +129,20 @@
     {{-- Structured data --}}
     <script type="application/ld+json">
     {
-        "@context": "https://schema.org",
-        "@type": "Organization",
+        "@@context": "https://schema.org",
+        "@@type": "Organization",
         "name": "Nomdal",
         "url": "{{ url('/') }}",
         "logo": "{{ url('/images/og-image.png') }}",
         "email": "hello@nomdal.com",
         "telephone": "+2349022239628",
-        "address": { "@type": "PostalAddress", "addressLocality": "Lagos", "addressCountry": "NG" }
+        "address": { "@@type": "PostalAddress", "addressLocality": "Lagos", "addressCountry": "NG" }
     }
     </script>
     <script type="application/ld+json">
     {
-        "@context": "https://schema.org",
-        "@type": "WebSite",
+        "@@context": "https://schema.org",
+        "@@type": "WebSite",
         "name": "Nomdal",
         "url": "{{ url('/') }}"
     }
