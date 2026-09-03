@@ -1,7 +1,7 @@
 @extends('frontpage.layouts.app')
 
 @section('title', 'Nomdal — AI Employees for Your Business')
-@section('meta_description', 'Nomdal builds AI employees that handle conversations, orders, appointments, and follow-ups — 24/7 on WhatsApp, web, and email. Start free.')
+@section('meta_description', 'Nomdal isn\'t just where customers talk to your business. It\'s where AI employees actually work — finding leads, taking orders, booking appointments, and following up, 24/7.')
 
 @section('content')
     {{-- Hero --}}
@@ -24,7 +24,12 @@
         <div class="relative mx-auto max-w-7xl px-6 pb-20 pt-16 lg:pt-24">
             
 
-            <h1 class="reveal mt-8 max-w-5xl font-display text-5xl font-black leading-[0.98] tracking-tight text-ink sm:text-7xl lg:text-8xl" data-reveal-delay="60">
+            <p class="reveal inline-flex items-center gap-2 rounded-full border border-ink/15 bg-white/50 px-4 py-1.5 font-mono text-xs uppercase tracking-widest text-ink-dim" data-reveal-delay="0">
+                <span class="h-1.5 w-1.5 rounded-full bg-lime"></span>
+                A chatbot answers. An AI employee works.
+            </p>
+
+            <h1 class="reveal mt-6 max-w-5xl font-display text-5xl font-black leading-[0.98] tracking-tight text-ink sm:text-7xl lg:text-8xl" data-reveal-delay="60">
                 AI employees that work your
                 <span class="text-periwinkle">front desk</span>,
                 <span class="text-lime">sales</span>, and
@@ -33,7 +38,7 @@
             </h1>
 
             <p class="reveal mt-8 max-w-2xl text-lg leading-relaxed text-ink-dim sm:text-xl" data-reveal-delay="120">
-                Nomdal builds AI employees that handle conversations, orders, appointments, and follow-ups — built for businesses in Nigeria, and everywhere your customers are.
+                Nomdal isn't just where customers talk to your business. It's where AI employees actually work for your business — finding leads, taking orders, booking appointments, and following up, 24/7.
             </p>
 
             <div class="reveal mt-10 flex flex-wrap items-center gap-6" data-reveal-delay="180">
@@ -54,10 +59,10 @@
     {{-- Capability ticker --}}
     <section class="overflow-hidden border-y border-ink/10 bg-purple/50 py-5">
         <div class="flex whitespace-nowrap ticker-track">
-            @foreach (['Conversations', 'Appointments', 'Orders', 'Leads', 'WhatsApp', 'Shopify', 'WooCommerce', 'Follow-ups', 'Analytics', 'Automations'] as $item)
+            @foreach (['Conversations', 'Appointments', 'Orders', 'Invoices', 'Leads', 'WhatsApp', 'Shopify', 'WooCommerce', 'Follow-ups', 'Reports', 'Analytics', 'Automations'] as $item)
                 <span class="mx-8 font-display text-2xl font-black uppercase tracking-tight text-ink">{{ $item }} <span class="text-lime">●</span></span>
             @endforeach
-            @foreach (['Conversations', 'Appointments', 'Orders', 'Leads', 'WhatsApp', 'Shopify', 'WooCommerce', 'Follow-ups', 'Analytics', 'Automations'] as $item)
+            @foreach (['Conversations', 'Appointments', 'Orders', 'Invoices', 'Leads', 'WhatsApp', 'Shopify', 'WooCommerce', 'Follow-ups', 'Reports', 'Analytics', 'Automations'] as $item)
                 <span class="mx-8 font-display text-2xl font-black uppercase tracking-tight text-ink">{{ $item }} <span class="text-lime">●</span></span>
             @endforeach
         </div>
@@ -139,13 +144,16 @@
     <section class="mx-auto max-w-7xl px-6 py-24 lg:py-32">
         <div class="reveal max-w-2xl">
             <p class="font-mono text-xs uppercase tracking-widest text-rust">AI employees</p>
-            <h2 class="mt-4 font-display text-4xl font-black tracking-tight text-ink sm:text-5xl">Hire a team, not a tool</h2>
+            <h2 class="mt-4 font-display text-4xl font-black tracking-tight text-ink sm:text-5xl">Hire an AI employee for every job</h2>
+            <p class="mt-4 text-ink-dim">Not a chatbot for support — a full team that finds leads, takes orders, books appointments, and clears the admin backlog.</p>
         </div>
-        <div class="mt-14 grid gap-6 md:grid-cols-3">
+        <div class="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             @php $roles = [
-                ['🤖', 'Sales Employee', 'Generates and qualifies leads, answers product questions, and creates orders.', 'bg-peach/40'],
-                ['🎧', 'Support Employee', 'Resolves questions, checks order status, and creates tickets.', 'bg-citron/40'],
-                ['📞', 'Receptionist', 'Schedules appointments and handles every inquiry — even after hours.', 'bg-blush/40'],
+                ['🎯', 'Sales Employee', 'Finds prospects, qualifies leads, starts conversations, follows up, and alerts you when someone is ready to talk.', 'bg-peach/40'],
+                ['🎧', 'Support Employee', 'Answers questions, resolves common issues, checks orders, and escalates problems.', 'bg-citron/40'],
+                ['📞', 'Receptionist', 'Books appointments, answers enquiries, and keeps your calendar organized.', 'bg-blush/40'],
+                ['📦', 'Order Employee', 'Handles product enquiries, creates orders, sends invoices, and keeps customers updated.', 'bg-periwinkle/30'],
+                ['🗂️', 'Admin Employee', 'Handles repetitive requests, documents, reports, and routine business tasks.', 'bg-purple/70'],
             ]; @endphp
             @foreach ($roles as [$icon, $title, $description, $tint])
                 <div class="reveal rounded-3xl border border-ink/10 {{ $tint }} p-8 transition hover:-translate-y-1 hover:border-ink/25">
@@ -203,8 +211,9 @@
                 <div class="reveal rounded-3xl border border-ink bg-ink p-8" data-reveal-delay="100">
                     <h3 class="text-lg font-bold text-lime">Nomdal AI employee</h3>
                     <ul class="mt-4 space-y-3 text-sm text-bone/85">
-                        <li>Creates leads, orders, and invoices</li>
-                        <li>Books and confirms appointments</li>
+                        <li>Finds leads, takes orders, and sends invoices</li>
+                        <li>Books appointments and runs follow-ups</li>
+                        <li>Clears routine docs, reports, and admin tasks</li>
                         <li>Remembers customers in a built-in CRM</li>
                         <li>Works on WhatsApp, web, email &amp; API</li>
                     </ul>

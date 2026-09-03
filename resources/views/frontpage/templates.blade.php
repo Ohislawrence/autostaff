@@ -28,13 +28,16 @@
         <div class="mx-auto max-w-7xl px-6 py-24 lg:py-32">
             <div class="reveal max-w-2xl">
                 <p class="font-mono text-xs uppercase tracking-widest text-rust">Core roles</p>
-                <h2 class="mt-4 font-display text-4xl font-black tracking-tight text-ink sm:text-5xl">Your first three hires</h2>
+                <h2 class="mt-4 font-display text-4xl font-black tracking-tight text-ink sm:text-5xl">Your core roster</h2>
+                <p class="mt-4 text-ink-dim">Five proven employees to start from — each with the tools it needs to do real work, not just chat.</p>
             </div>
-            <div class="mt-14 grid gap-6 md:grid-cols-3">
+            <div class="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 @php $core = [
-                    ['🤖', 'Sales Employee', 'Generates and qualifies leads, answers product questions, and creates orders.', ['create_lead', 'create_order', 'search_products', 'get_price'], 'bg-peach/40'],
-                    ['🎧', 'Support Employee', 'Resolves questions, checks order status, and creates tickets.', ['get_order_status', 'create_task', 'transfer_to_human'], 'bg-citron/40'],
-                    ['📞', 'Receptionist', 'Schedules, reschedules, and confirms appointments.', ['schedule_appointment', 'get_available_slots', 'transfer_to_human'], 'bg-blush/40'],
+                    ['🎯', 'Sales Employee', 'Finds prospects, qualifies leads, starts conversations, follows up, and alerts you when someone is ready to talk.', ['create_lead', 'create_customer', 'search_products', 'get_price'], 'bg-peach/40'],
+                    ['🎧', 'Support Employee', 'Answers questions, resolves common issues, checks orders, and escalates problems.', ['get_order_status', 'create_task', 'transfer_to_human'], 'bg-citron/40'],
+                    ['📞', 'Receptionist', 'Books appointments, answers enquiries, and keeps your calendar organized.', ['schedule_appointment', 'get_available_slots', 'transfer_to_human'], 'bg-blush/40'],
+                    ['📦', 'Order Employee', 'Handles product enquiries, creates orders, sends invoices, and keeps customers updated.', ['create_order', 'get_order', 'get_order_status', 'check_inventory'], 'bg-periwinkle/30'],
+                    ['🗂️', 'Admin Employee', 'Handles repetitive requests, documents, reports, and routine business tasks.', ['create_task', 'create_customer', 'transfer_to_human'], 'bg-purple/70'],
                 ]; @endphp
                 @foreach ($core as [$icon, $title, $description, $tools, $tint])
                     <div class="reveal flex flex-col rounded-3xl border border-ink/10 {{ $tint }} p-8">

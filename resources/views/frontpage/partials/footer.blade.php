@@ -7,7 +7,7 @@
                     <span class="font-display text-base font-black text-ink">Nomdal</span>
                 </div>
                 <p class="mt-4 max-w-xs text-sm leading-relaxed text-ink-dim">
-                    AI employees that answer, sell, and follow up — built for businesses in Nigeria, and everywhere your customers are.
+                    AI employees that actually work for your business — selling, supporting, booking, ordering, and handling admin around the clock.
                 </p>
             </div>
             <div>

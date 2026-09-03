@@ -53,13 +53,15 @@
         <div class="reveal max-w-3xl">
             <p class="font-mono text-xs uppercase tracking-widest text-forest">AI employees</p>
             <h2 class="mt-4 font-display text-4xl font-black tracking-tight text-ink sm:text-5xl">Hire every role, or build your own</h2>
-            <p class="mt-4 text-ink-dim">Start from a proven template and tune the role, personality, knowledge, and tools. Your AI employee is always on, always consistent, and never off the clock.</p>
+            <p class="mt-4 text-ink-dim">Start from a proven template and tune the role, personality, knowledge, and tools. Your AI employee is always on, always consistent, and never off the clock — and it does the work, not just the chat.</p>
         </div>
-        <div class="mt-14 grid gap-6 md:grid-cols-3">
+        <div class="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             @php $roles = [
-                ['🤖', 'Sales Employee', 'Generates and qualifies leads, answers product questions, and creates orders.', 'bg-peach/40'],
-                ['🎧', 'Support Employee', 'Resolves questions, checks order status, and creates tickets.', 'bg-citron/40'],
-                ['📞', 'Receptionist', 'Schedules appointments, handles inquiries, and confirms bookings.', 'bg-blush/40'],
+                ['🎯', 'Sales Employee', 'Finds prospects, qualifies leads, starts conversations, follows up, and alerts you when someone is ready to talk.', 'bg-peach/40'],
+                ['🎧', 'Support Employee', 'Answers questions, resolves common issues, checks orders, and escalates problems.', 'bg-citron/40'],
+                ['📞', 'Receptionist', 'Books appointments, answers enquiries, and keeps your calendar organized.', 'bg-blush/40'],
+                ['📦', 'Order Employee', 'Handles product enquiries, creates orders, sends invoices, and keeps customers updated.', 'bg-periwinkle/30'],
+                ['🗂️', 'Admin Employee', 'Handles repetitive requests, documents, reports, and routine business tasks.', 'bg-purple/70'],
             ]; @endphp
             @foreach ($roles as [$icon, $title, $description, $tint])
                 <div class="reveal rounded-3xl border border-ink/10 {{ $tint }} p-8">
