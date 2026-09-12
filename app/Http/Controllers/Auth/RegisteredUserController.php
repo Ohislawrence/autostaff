@@ -58,6 +58,13 @@ class RegisteredUserController extends Controller
             'is_owner' => true,
         ]);
 
+        // Start on the Free plan (no payment required).
+        try {
+            app(\App\Services\Billing\SubscriptionService::class)->subscribeFree($organization);
+        } catch (\Throwable $e) {
+            // Never block signup if the Free plan isn't available.
+        }
+
         Auth::login($user);
         $request->session()->regenerate();
         session(['current_organization_id' => $organization->id]);

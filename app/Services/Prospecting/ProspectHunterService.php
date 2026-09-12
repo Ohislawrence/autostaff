@@ -29,9 +29,9 @@ class ProspectHunterService
         $sources = ['web_search' => 0, 'ai_generated' => 0];
 
         // 1. Live web search (only when a provider + key are configured).
-        if ($this->webSearch->isConfigured()) {
+        if ($this->webSearch->isConfigured($campaign->organization_id)) {
             foreach ($this->buildQueries($campaign) as $query) {
-                $results = $this->webSearch->search($query, min($limit, 5));
+                $results = $this->webSearch->search($query, min($limit, 5), $campaign->organization_id);
                 foreach ($results as $result) {
                     if ($created >= $limit) {
                         break 2;
@@ -78,10 +78,11 @@ class ProspectHunterService
     protected function buildQueries(ProspectingCampaign $campaign): array
     {
         $icp = $campaign->icp ?? [];
+        $persona = $campaign->buyer_persona_snapshot ?? [];
         $industry = (array) ($icp['industry'] ?? []);
-        $titles = (array) ($icp['job_titles'] ?? []);
+        $titles = array_merge((array) ($icp['job_titles'] ?? []), (array) ($persona['role_titles'] ?? []));
         $geo = (array) ($icp['geography'] ?? []);
-        $keywords = (array) ($icp['keywords'] ?? []);
+        $keywords = array_merge((array) ($icp['keywords'] ?? []), (array) ($persona['keywords'] ?? []));
 
         $parts = array_values(array_filter([
             implode(' ', array_slice($keywords, 0, 2)),

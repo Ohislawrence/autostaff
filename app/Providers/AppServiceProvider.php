@@ -90,6 +90,10 @@ class AppServiceProvider extends ServiceProvider
             $registry->register('draft_outreach', \App\Ai\Tools\BuiltIn\DraftOutreachTool::class);
             $registry->register('send_outreach', \App\Ai\Tools\BuiltIn\SendOutreachTool::class);
             $registry->register('get_prospecting_status', \App\Ai\Tools\BuiltIn\GetProspectingStatusTool::class);
+            $registry->register('research_prospect', \App\Ai\Tools\BuiltIn\ResearchProspectTool::class);
+            $registry->register('generate_proposal', \App\Ai\Tools\BuiltIn\GenerateProposalTool::class);
+            $registry->register('book_meeting', \App\Ai\Tools\BuiltIn\BookMeetingTool::class);
+            $registry->register('run_outbound_pipeline', \App\Ai\Tools\BuiltIn\RunOutboundPipelineTool::class);
 
             $registry->setDynamicResolver(function (string $identifier, ?int $organizationId) {
                 return app(McpToolRegistrar::class)->resolve($identifier, $organizationId);

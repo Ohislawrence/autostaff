@@ -37,13 +37,12 @@ class UsageTracker
      */
     public function isAtLimit(Organization $organization, string $resource): bool
     {
-        $subscription = $organization->subscriptions()->where('status', 'active')->latest()->first();
-        
-        if (!$subscription || !$subscription->plan) {
-            return true; // No active plan = restricted
+        $plan = $this->resolvePlan($organization);
+
+        if (!$plan) {
+            return true; // No plan available = restricted
         }
 
-        $plan = $subscription->plan;
         $usage = $this->getUsage($organization);
 
         return match ($resource) {
@@ -56,17 +55,31 @@ class UsageTracker
     }
 
     /**
+     * Resolve the active plan for an organization, falling back to the Free
+     * plan so unsubscribed orgs can still use the platform within free limits.
+     */
+    protected function resolvePlan(Organization $organization): ?\App\Models\Plan
+    {
+        $subscription = $organization->subscriptions()->where('status', 'active')->latest()->first();
+
+        if ($subscription && $subscription->plan) {
+            return $subscription->plan;
+        }
+
+        return \App\Models\Plan::where('slug', 'free')->where('is_active', true)->first();
+    }
+
+    /**
      * Get usage percentage for a specific resource.
      */
     public function getUsagePercentage(Organization $organization, string $resource): int
     {
-        $subscription = $organization->subscriptions()->where('status', 'active')->latest()->first();
+        $plan = $this->resolvePlan($organization);
         
-        if (!$subscription || !$subscription->plan) {
+        if (!$plan) {
             return 100;
         }
 
-        $plan = $subscription->plan;
         $usage = $this->getUsage($organization);
 
         $percentage = match ($resource) {
@@ -93,14 +106,12 @@ class UsageTracker
      */
     public function getUpgradePlan(Organization $organization): ?array
     {
-        $subscription = $organization->subscriptions()->where('status', 'active')->latest()->first();
-        
-        if (!$subscription || !$subscription->plan) {
-            $nextPlan = \App\Models\Plan::where('is_active', true)->orderBy('sort_order')->first();
-            return $nextPlan ? ['plan' => $nextPlan, 'is_downgrade' => false] : null;
+        $currentPlan = $this->resolvePlan($organization);
+
+        if (!$currentPlan) {
+            return null;
         }
 
-        $currentPlan = $subscription->plan;
         $nextPlan = \App\Models\Plan::where('is_active', true)
             ->where('sort_order', '>', $currentPlan->sort_order)
             ->orderBy('sort_order')
@@ -114,18 +125,16 @@ class UsageTracker
      */
     public function getLimitsWithUsage(Organization $organization): array
     {
-        $subscription = $organization->subscriptions()->where('status', 'active')->latest()->first();
         $usage = $this->getUsage($organization);
+        $plan = $this->resolvePlan($organization);
 
-        if (!$subscription || !$subscription->plan) {
+        if (!$plan) {
             return [
                 'plan' => null,
                 'limits' => [],
                 'usage' => $usage,
             ];
         }
-
-        $plan = $subscription->plan;
 
         return [
             'plan' => $plan,

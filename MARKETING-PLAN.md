@@ -1,6 +1,6 @@
 # Nomdal — Marketing & Growth Plan
 
-> **Product:** Nomdal (AI Employee Platform) — a multi-tenant SaaS that lets businesses create, configure, deploy, and manage AI-powered "digital employees" that handle sales, support, reception, appointments, orders, and follow-ups across WhatsApp, web chat, email, REST API, and MCP-connected tools (Gmail, Calendar, CRM, Microsoft 365, custom).
+> **Product:** Nomdal — AI employees that run repetitive business work. Nomdal finds potential customers, qualifies them, and follows up automatically, then handles sales, support, appointments, orders, and follow-ups across WhatsApp, web chat, email, REST API, and connected tools (Gmail, Calendar, CRM, Microsoft 365, custom).
 > **Goal:** Reach **$1,000,000 annual recurring revenue (ARR)** within **6 months**.
 > **Primary market:** Nigeria / Africa-first (WhatsApp-first, NGN pricing via Nomba), then global (USD, self-serve + API).
 

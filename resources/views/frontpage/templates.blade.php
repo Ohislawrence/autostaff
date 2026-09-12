@@ -13,7 +13,7 @@
                     Hire an AI employee for <span class="text-periwinkle">every job</span>
                 </h1>
                 <p class="mt-6 max-w-2xl text-lg leading-relaxed text-ink-dim sm:text-xl">
-                    Start from a proven template or build your own. Every AI employee comes with a role, personality, knowledge base, and the tools it needs to get work done — on your channels, around the clock.
+                    Start with a Sales Employee that finds prospects, qualifies leads, and follows up automatically — then add support, bookings, orders, and admin as you grow.
                 </p>
                 <div class="mt-10 flex flex-wrap items-center gap-6">
                     <a href="{{ route('login') }}" class="inline-flex items-center gap-2 rounded-full bg-ink px-7 py-3.5 text-sm font-bold text-bone transition hover:bg-forest">Start free</a>
@@ -29,7 +29,7 @@
             <div class="reveal max-w-2xl">
                 <p class="font-mono text-xs uppercase tracking-widest text-rust">Core roles</p>
                 <h2 class="mt-4 font-display text-4xl font-black tracking-tight text-ink sm:text-5xl">Your core roster</h2>
-                <p class="mt-4 text-ink-dim">Five proven employees to start from — each with the tools it needs to do real work, not just chat.</p>
+                <p class="mt-4 text-ink-dim">Start with a Sales Employee that finds and qualifies customers — then add the rest. Each has the tools to do real work, not just chat.</p>
             </div>
             <div class="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 @php $core = [
@@ -39,10 +39,18 @@
                     ['📦', 'Order Employee', 'Handles product enquiries, creates orders, sends invoices, and keeps customers updated.', ['create_order', 'get_order', 'get_order_status', 'check_inventory'], 'bg-periwinkle/30'],
                     ['🗂️', 'Admin Employee', 'Handles repetitive requests, documents, reports, and routine business tasks.', ['create_task', 'create_customer', 'transfer_to_human'], 'bg-purple/70'],
                 ]; @endphp
+                @php $departments = [
+                    'Sales Employee' => '💰 Revenue',
+                    'Support Employee' => '💬 Customer Experience',
+                    'Receptionist' => '💬 Customer Experience',
+                    'Order Employee' => '🛒 Operations',
+                    'Admin Employee' => '🧑‍💼 Administration',
+                ]; @endphp
                 @foreach ($core as [$icon, $title, $description, $tools, $tint])
                     <div class="reveal flex flex-col rounded-3xl border border-ink/10 {{ $tint }} p-8">
                         <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/60 text-2xl">{{ $icon }}</div>
                         <h3 class="mt-5 text-xl font-bold text-ink">{{ $title }}</h3>
+                        <p class="mt-1 font-mono text-[11px] uppercase tracking-widest text-ink-faint">{{ $departments[$title] ?? '' }}</p>
                         <p class="mt-2 text-sm leading-relaxed text-ink-dim">{{ $description }}</p>
                         <div class="mt-5 flex flex-wrap gap-2">
                             @foreach ($tools as $tool)

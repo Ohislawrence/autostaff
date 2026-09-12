@@ -1,7 +1,7 @@
 import { usePage, router } from '@inertiajs/react';
 import { useState } from 'react';
 
-export default function OnboardingWizard({ step, steps, organization, aiEmployee }) {
+export default function OnboardingWizard({ step, steps, organization, aiEmployee, offering, pricePoint, icp, campaign, prospects }) {
     const { errors } = usePage().props;
     const [submitting, setSubmitting] = useState(false);
 
@@ -60,6 +60,22 @@ export default function OnboardingWizard({ step, steps, organization, aiEmployee
 
                     {step === 'create_ai_employee' && (
                         <CreateAiEmployeeForm onSubmit={handleSubmit} errors={errors} submitting={submitting} organization={organization} />
+                    )}
+
+                    {step === 'sales_goal' && (
+                        <SalesGoalForm onSubmit={handleSubmit} errors={errors} submitting={submitting} organization={organization} offering={offering} pricePoint={pricePoint} />
+                    )}
+
+                    {step === 'icp' && (
+                        <IcpForm onSubmit={handleSubmit} errors={errors} submitting={submitting} organization={organization} icp={icp} />
+                    )}
+
+                    {step === 'launch' && (
+                        <LaunchStep onSubmit={handleSubmit} submitting={submitting} organization={organization} offering={offering} pricePoint={pricePoint} icp={icp} />
+                    )}
+
+                    {step === 'results' && (
+                        <ResultsStep organization={organization} aiEmployee={aiEmployee} campaign={campaign} prospects={prospects} />
                     )}
 
                     {step === 'complete' && (
@@ -314,3 +330,170 @@ function CompleteStep({ organization, aiEmployee }) {
         </div>
     );
 }
+
+function SalesGoalForm({ onSubmit, errors, submitting, organization, offering, pricePoint }) {
+    const [form, setForm] = useState({
+        offering: offering || '',
+        price_point: pricePoint || '',
+    });
+    const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+    const inputCls = "w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none";
+
+    return (
+        <form onSubmit={(e) => { e.preventDefault(); onSubmit('/onboarding/sales-goal', form); }}>
+            <div className="text-center mb-6">
+                <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl">💼</div>
+                <h2 className="text-lg font-semibold text-gray-900">What do you sell?</h2>
+                <p className="text-sm text-gray-500 mt-1">Nomdal will find and qualify customers for exactly this.</p>
+            </div>
+            <div className="space-y-4">
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">What do you sell? *</label>
+                    <input name="offering" type="text" required autoFocus value={form.offering} onChange={handleChange} placeholder="e.g. Professional websites for SMEs" className={inputCls} />
+                    {errors?.offering && <p className="mt-1 text-xs text-red-500">{errors.offering}</p>}
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">How much is your service? (optional)</label>
+                    <input name="price_point" type="text" value={form.price_point} onChange={handleChange} placeholder="e.g. ₦250,000" className={inputCls} />
+                </div>
+            </div>
+            <button type="submit" disabled={submitting} className="w-full mt-6 px-4 py-2.5 bg-primary-600 text-white rounded-lg text-sm font-semibold hover:bg-primary-700 disabled:opacity-50 transition-colors">
+                {submitting ? 'Saving...' : 'Continue'}
+            </button>
+        </form>
+    );
+}
+
+function IcpForm({ onSubmit, errors, submitting, organization, icp }) {
+    const [form, setForm] = useState({
+        industry: (icp?.industry || []).join(', '),
+        company_size: icp?.company_size || '',
+        geography: (icp?.geography || []).join(', '),
+        keywords: (icp?.keywords || []).join(', '),
+        budget: icp?.budget || '',
+        pain_points: icp?.pain_points || '',
+    });
+    const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+    const inputCls = "w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none";
+
+    return (
+        <form onSubmit={(e) => { e.preventDefault(); onSubmit('/onboarding/icp', form); }}>
+            <div className="text-center mb-6">
+                <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl">🎯</div>
+                <h2 className="text-lg font-semibold text-gray-900">Who do you want as customers?</h2>
+                <p className="text-sm text-gray-500 mt-1">This becomes Nomdal's ideal customer profile for hunting.</p>
+            </div>
+            <div className="space-y-4">
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Business type / industry</label>
+                    <input name="industry" type="text" value={form.industry} onChange={handleChange} placeholder="SMEs, retail, clinics" className={inputCls} />
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Company size</label>
+                    <input name="company_size" type="text" value={form.company_size} onChange={handleChange} placeholder="5–50 employees" className={inputCls} />
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                    <input name="geography" type="text" value={form.geography} onChange={handleChange} placeholder="Nigeria, Lagos" className={inputCls} />
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Keywords (what they might search)</label>
+                    <input name="keywords" type="text" value={form.keywords} onChange={handleChange} placeholder="website, booking, e-commerce" className={inputCls} />
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Customer budget</label>
+                    <input name="budget" type="text" value={form.budget} onChange={handleChange} placeholder="₦150k–₦500k" className={inputCls} />
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Their need / pain point</label>
+                    <input name="pain_points" type="text" value={form.pain_points} onChange={handleChange} placeholder="outdated website, missed leads" className={inputCls} />
+                </div>
+            </div>
+            <button type="submit" disabled={submitting} className="w-full mt-6 px-4 py-2.5 bg-primary-600 text-white rounded-lg text-sm font-semibold hover:bg-primary-700 disabled:opacity-50 transition-colors">
+                {submitting ? 'Saving...' : 'Continue'}
+            </button>
+        </form>
+    );
+}
+
+function LaunchStep({ onSubmit, submitting, organization, offering, pricePoint, icp }) {
+    const [name, setName] = useState('Alex — Sales Assistant');
+    const industry = (icp?.industry || []).join(', ') || 'any industry';
+    const geo = (icp?.geography || []).join(', ') || 'anywhere';
+
+    return (
+        <form onSubmit={(e) => { e.preventDefault(); onSubmit('/onboarding/launch', { employee_name: name }); }}>
+            <div className="text-center mb-6">
+                <div className="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl">🤖</div>
+                <h2 className="text-lg font-semibold text-gray-900">Hire your AI Sales Employee</h2>
+                <p className="text-sm text-gray-500 mt-1">Here's what Nomdal will set up for you.</p>
+            </div>
+
+            <div className="space-y-3 mb-6">
+                <div className="bg-gray-50 rounded-xl p-4">
+                    <p className="text-xs text-gray-400 uppercase tracking-wide">AI Sales Employee</p>
+                    <p className="font-medium text-gray-900">🎯 {name}</p>
+                </div>
+                <div className="bg-gray-50 rounded-xl p-4">
+                    <p className="text-xs text-gray-400 uppercase tracking-wide">Offering</p>
+                    <p className="font-medium text-gray-900">{offering || 'Your product/service'}{pricePoint ? ` — from ${pricePoint}` : ''}</p>
+                </div>
+                <div className="bg-gray-50 rounded-xl p-4">
+                    <p className="text-xs text-gray-400 uppercase tracking-wide">Ideal Customer Profile</p>
+                    <p className="font-medium text-gray-900">{industry} · {geo}</p>
+                </div>
+            </div>
+
+            <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Employee name</label>
+                <input type="text" value={name} onChange={(e) => setName(e.target.value)} className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none" />
+            </div>
+
+            <button type="submit" disabled={submitting} className="w-full mt-6 px-4 py-2.5 bg-primary-600 text-white rounded-lg text-sm font-semibold hover:bg-primary-700 disabled:opacity-50 transition-colors">
+                {submitting ? 'Launching…' : '🚀 Launch & find my first customers'}
+            </button>
+        </form>
+    );
+}
+
+function ResultsStep({ organization, aiEmployee, campaign, prospects }) {
+    const list = prospects || [];
+    return (
+        <div className="text-center">
+            <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl">🎉</div>
+            <h2 className="text-lg font-semibold text-gray-900">Your AI Sales Employee is on the job</h2>
+            <p className="text-sm text-gray-500 mt-1">
+                {aiEmployee ? `"${aiEmployee.name}" is hunting for prospects.` : 'Your sales rep is hunting for prospects.'}
+            </p>
+
+            {list.length > 0 && (
+                <div className="mt-6 text-left space-y-2">
+                    <p className="text-xs text-gray-400 uppercase tracking-wide font-medium">Prospects found</p>
+                    {list.map((p) => (
+                        <div key={p.id} className="bg-gray-50 rounded-xl p-3 flex items-center gap-3">
+                            <span className={`inline-flex items-center justify-center w-9 h-9 rounded-full text-xs font-bold shrink-0 ${p.score >= 7 ? 'bg-green-100 text-green-700' : p.score >= 4 ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-200 text-gray-600'}`}>{p.score || '–'}</span>
+                            <div className="min-w-0 flex-1">
+                                <p className="text-sm font-medium text-gray-900 truncate">{p.name || 'Prospect'}</p>
+                                <p className="text-xs text-gray-500 truncate">{p.company || ''}{p.location ? ` · ${p.location}` : ''}</p>
+                                {p.qualification_notes && <p className="text-xs text-gray-400 mt-0.5 truncate">{p.qualification_notes}</p>}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+
+            {list.length === 0 && (
+                <p className="mt-4 text-sm text-gray-400">Nomdal is searching for matching prospects. Check the Prospecting page in a moment.</p>
+            )}
+
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+                <a href="/prospecting" className="inline-flex px-6 py-3 bg-primary-600 text-white rounded-lg text-sm font-semibold hover:bg-primary-700 transition-colors">View Prospects</a>
+                <form method="POST" action="/onboarding/complete" className="inline-flex">
+                    <input type="hidden" name="_token" value={document.querySelector('meta[name="csrf-token"]')?.content} />
+                    <button type="submit" className="inline-flex px-6 py-3 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-semibold hover:bg-gray-50 transition-colors">Go to Dashboard</button>
+                </form>
+            </div>
+        </div>
+    );
+}
+

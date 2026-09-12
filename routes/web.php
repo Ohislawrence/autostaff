@@ -212,6 +212,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/onboarding/create-org', [\App\Http\Controllers\OnboardingController::class, 'createOrganization'])->name('onboarding.create-org');
     Route::post('/onboarding/configure-profile', [\App\Http\Controllers\OnboardingController::class, 'configureProfile'])->name('onboarding.configure-profile');
     Route::post('/onboarding/create-ai-employee', [\App\Http\Controllers\OnboardingController::class, 'createAiEmployee'])->name('onboarding.create-ai-employee');
+    Route::post('/onboarding/sales-goal', [\App\Http\Controllers\OnboardingController::class, 'storeSalesGoal'])->name('onboarding.sales-goal');
+    Route::post('/onboarding/icp', [\App\Http\Controllers\OnboardingController::class, 'storeIcp'])->name('onboarding.icp');
+    Route::post('/onboarding/launch', [\App\Http\Controllers\OnboardingController::class, 'launchCampaign'])->name('onboarding.launch');
+    Route::post('/onboarding/complete', [\App\Http\Controllers\OnboardingController::class, 'finish'])->name('onboarding.complete');
 
     // Switch organization
     Route::post('/switch-organization', [\App\Http\Controllers\TeamController::class, 'switchOrganization'])
@@ -229,6 +233,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::middleware('can:ai-employees.create')->group(function () {
             Route::get('/ai-employees/create', [AiEmployeeController::class, 'create'])->name('ai-employees.create');
             Route::post('/ai-employees', [AiEmployeeController::class, 'store'])->name('ai-employees.store');
+        });
+
+        // AI workforce (recommend + deploy) — registered before {aiEmployee} routes
+        Route::middleware('can:ai-employees.view')->group(function () {
+            Route::get('/ai-employees/workforce', [AiEmployeeController::class, 'recommendWorkforce'])->name('ai-employees.workforce');
+        });
+        Route::middleware('can:ai-employees.create')->group(function () {
+            Route::post('/ai-employees/workforce/deploy', [AiEmployeeController::class, 'deployWorkforce'])->name('ai-employees.workforce.deploy');
         });
         Route::middleware('can:ai-employees.update')->group(function () {
             Route::get('/ai-employees/{aiEmployee}/edit', [AiEmployeeController::class, 'edit'])->name('ai-employees.edit');
@@ -282,6 +294,41 @@ Route::middleware(['auth', 'verified'])->group(function () {
         });
         Route::middleware('can:leads.update')->group(function () {
             Route::put('/leads/{lead}', [\App\Http\Controllers\LeadController::class, 'update'])->name('leads.update');
+        });
+
+        // Prospecting (outbound AI Sales Employee — tenant-scoped)
+        Route::middleware('can:prospecting.view')->group(function () {
+            Route::get('/prospecting', [\App\Http\Controllers\ProspectingController::class, 'index'])->name('prospecting.index');
+            Route::get('/prospecting/campaigns', [\App\Http\Controllers\ProspectingController::class, 'campaigns'])->name('prospecting.campaigns');
+            Route::get('/prospecting/prospects', [\App\Http\Controllers\ProspectingController::class, 'prospects'])->name('prospecting.prospects');
+            Route::get('/prospecting/prospects/{prospect}', [\App\Http\Controllers\ProspectingController::class, 'showProspect'])->name('prospecting.prospects.show');
+            Route::get('/prospecting/suppression', [\App\Http\Controllers\ProspectingController::class, 'suppression'])->name('prospecting.suppression');
+            Route::get('/prospecting/settings', [\App\Http\Controllers\ProspectingController::class, 'settings'])->name('prospecting.settings');
+            Route::get('/prospecting/personas', [\App\Http\Controllers\BuyerPersonaController::class, 'index'])->name('prospecting.personas');
+        });
+        Route::middleware('can:prospecting.manage')->group(function () {
+            Route::put('/prospecting/settings', [\App\Http\Controllers\ProspectingController::class, 'updateSettings'])->name('prospecting.settings.update');
+            Route::post('/prospecting/personas/generate', [\App\Http\Controllers\BuyerPersonaController::class, 'generate'])->name('prospecting.personas.generate');
+            Route::post('/prospecting/personas/use-template', [\App\Http\Controllers\BuyerPersonaController::class, 'useTemplate'])->name('prospecting.personas.use-template');
+            Route::post('/prospecting/personas', [\App\Http\Controllers\BuyerPersonaController::class, 'store'])->name('prospecting.personas.store');
+            Route::put('/prospecting/personas/{persona}', [\App\Http\Controllers\BuyerPersonaController::class, 'update'])->name('prospecting.personas.update');
+            Route::delete('/prospecting/personas/{persona}', [\App\Http\Controllers\BuyerPersonaController::class, 'destroy'])->name('prospecting.personas.destroy');
+            Route::post('/prospecting/campaigns', [\App\Http\Controllers\ProspectingController::class, 'storeCampaign'])->name('prospecting.campaigns.store');
+            Route::put('/prospecting/campaigns/{campaign}', [\App\Http\Controllers\ProspectingController::class, 'updateCampaign'])->name('prospecting.campaigns.update');
+            Route::delete('/prospecting/campaigns/{campaign}', [\App\Http\Controllers\ProspectingController::class, 'destroyCampaign'])->name('prospecting.campaigns.destroy');
+            Route::post('/prospecting/campaigns/{campaign}/toggle', [\App\Http\Controllers\ProspectingController::class, 'toggleCampaign'])->name('prospecting.campaigns.toggle');
+            Route::post('/prospecting/campaigns/{campaign}/hunt', [\App\Http\Controllers\ProspectingController::class, 'runHunt'])->name('prospecting.campaigns.hunt');
+            Route::post('/prospecting/campaigns/{campaign}/qualify', [\App\Http\Controllers\ProspectingController::class, 'qualifyAll'])->name('prospecting.campaigns.qualify');
+            Route::post('/prospecting/campaigns/{campaign}/outreach', [\App\Http\Controllers\ProspectingController::class, 'runOutreach'])->name('prospecting.campaigns.outreach');
+            Route::post('/prospecting/campaigns/{campaign}/research', [\App\Http\Controllers\ProspectingController::class, 'researchQualified'])->name('prospecting.campaigns.research');
+            Route::post('/prospecting/campaigns/{campaign}/followup', [\App\Http\Controllers\ProspectingController::class, 'runFollowups'])->name('prospecting.campaigns.followup');
+            Route::post('/prospecting/prospects/{prospect}/qualify', [\App\Http\Controllers\ProspectingController::class, 'qualifyProspect'])->name('prospecting.prospects.qualify');
+            Route::post('/prospecting/prospects/{prospect}/research', [\App\Http\Controllers\ProspectingController::class, 'researchProspect'])->name('prospecting.prospects.research');
+            Route::post('/prospecting/prospects/{prospect}/generate', [\App\Http\Controllers\ProspectingController::class, 'generateProspect'])->name('prospecting.prospects.generate');
+            Route::post('/prospecting/prospects/{prospect}/send', [\App\Http\Controllers\ProspectingController::class, 'sendProspect'])->name('prospecting.prospects.send');
+            Route::post('/prospecting/prospects/{prospect}/suppress', [\App\Http\Controllers\ProspectingController::class, 'suppressProspect'])->name('prospecting.prospects.suppress');
+            Route::post('/prospecting/prospects/{prospect}/convert', [\App\Http\Controllers\ProspectingController::class, 'convertProspect'])->name('prospecting.prospects.convert');
+            Route::post('/prospecting/prospects/{prospect}/meeting', [\App\Http\Controllers\ProspectingController::class, 'bookMeeting'])->name('prospecting.prospects.meeting');
         });
 
         // Products

@@ -33,6 +33,63 @@ export default function Dashboard({ stats, dashboardType, greeting }) {
                 <span className="text-sm text-gray-400">{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</span>
             </div>
 
+            {/* This Month — money-first headline */}
+            <div className="mb-6 bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+                <div className="flex items-center justify-between px-5 py-4 border-b border-gray-50">
+                    <div className="flex items-center gap-3">
+                        <span className="flex items-center justify-center w-9 h-9 rounded-lg bg-gradient-to-br from-emerald-50 to-green-100 text-lg">💵</span>
+                        <div>
+                            <h2 className="text-sm font-semibold text-gray-900">This Month</h2>
+                            <p className="text-xs text-gray-400">Revenue &amp; pipeline at a glance</p>
+                        </div>
+                    </div>
+                    <span className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-500 bg-gray-50 border border-gray-100 rounded-full px-3 py-1.5">
+                        <span className="text-amber-500">⚡</span> {stats.ai_work_completed ?? 0} AI actions
+                    </span>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-5 divide-x divide-y md:divide-y-0 divide-gray-50">
+                    <MoneyCard label="Revenue" value={formatRevenue(stats.revenue_this_month, currencySymbol)} color="text-green-700" icon="💰" />
+                    <MoneyCard label="Qualified Leads" value={stats.qualified_leads ?? 0} color="text-amber-700" icon="🎯" />
+                    <MoneyCard label="Deals Won" value={stats.deals_won ?? 0} sub={`${stats.deals_won_this_month ?? 0} this month`} color="text-blue-700" icon="🤝" />
+                    <MoneyCard label="Prospects Contacted" value={stats.prospects_contacted ?? 0} color="text-purple-700" icon="📨" />
+                    <MoneyCard label="Pipeline Value" value={formatRevenue(stats.pipeline_value, currencySymbol)} color="text-teal-700" icon="📈" />
+                </div>
+            </div>
+
+            {/* AI Employee Activity */}
+            {stats.ai_activity?.length > 0 && (
+                <div className="mb-6 bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+                    <div className="flex items-center gap-3 px-5 py-4 border-b border-gray-50">
+                        <span className="flex items-center justify-center w-9 h-9 rounded-lg bg-gradient-to-br from-blue-50 to-indigo-100 text-lg">🤖</span>
+                        <div>
+                            <h2 className="text-sm font-semibold text-gray-900">AI Employee Activity</h2>
+                            <p className="text-xs text-gray-400">What your AI workforce did</p>
+                        </div>
+                    </div>
+                    <div className="divide-y divide-gray-50">
+                        {stats.ai_activity.map((e) => (
+                            <div key={e.name} className="flex flex-col sm:flex-row sm:items-center gap-3 px-5 py-3.5 hover:bg-gray-50/50 transition-colors">
+                                <div className="flex items-center gap-3 sm:w-56 shrink-0">
+                                    <span className="flex items-center justify-center w-10 h-10 rounded-lg bg-gray-50 text-xl shrink-0">{e.avatar || '🤖'}</span>
+                                    <div className="min-w-0">
+                                        <p className="text-sm font-semibold text-gray-900 truncate">{e.name}</p>
+                                        <p className="text-xs text-gray-400 truncate">{e.role}{!e.is_active && ' · paused'}</p>
+                                    </div>
+                                </div>
+                                <div className="flex-1 grid grid-cols-3 sm:grid-cols-6 gap-2">
+                                    <ActivityStat label="Conversations" value={e.conversations} />
+                                    <ActivityStat label="Leads" value={e.leads} />
+                                    <ActivityStat label="Found" value={e.prospects_found} />
+                                    <ActivityStat label="Qualified" value={e.prospects_qualified} />
+                                    <ActivityStat label="Contacted" value={e.prospects_contacted} />
+                                    <ActivityStat label="Replies" value={e.prospects_replied} />
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
             {/* KPI Cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
                 <KpiCard label="Customers" value={stats.customers_count} color="text-blue-700" bg="bg-gradient-to-br from-blue-50 to-blue-100" />
@@ -216,4 +273,26 @@ function formatRevenue(amount, symbol) {
     if (num >= 1000000) return s + (num / 1000000).toFixed(1) + 'M';
     if (num >= 1000) return s + (num / 1000).toFixed(1) + 'K';
     return s + num.toLocaleString(undefined, { minimumFractionDigits: 2 });
+}
+
+function MoneyCard({ label, value, sub, color, icon }) {
+    return (
+        <div className="p-4 min-w-0">
+            <div className="flex items-center gap-1.5 text-xs font-medium text-gray-500 mb-1.5">
+                <span>{icon}</span>
+                <span className="truncate">{label}</span>
+            </div>
+            <p className={`text-xl font-bold ${color}`}>{value ?? 0}</p>
+            {sub && <p className="text-[11px] text-gray-400 mt-0.5">{sub}</p>}
+        </div>
+    );
+}
+
+function ActivityStat({ label, value }) {
+    return (
+        <div className="rounded-lg bg-gray-50 px-2 py-1.5 text-center min-w-0">
+            <p className="text-sm font-bold text-gray-900">{value ?? 0}</p>
+            <p className="text-[10px] text-gray-400 truncate">{label}</p>
+        </div>
+    );
 }

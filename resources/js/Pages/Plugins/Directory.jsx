@@ -39,19 +39,25 @@ export default function Directory({ plugins = [] }) {
                     <h2 className="font-semibold text-amber-900 mb-2">⚠️ Copy your credentials now</h2>
                     <p className="text-xs text-amber-800 mb-3">These will not be shown again. Paste them into your plugin settings.</p>
                     {flash?.api_key && (
-                        <div className="flex items-center gap-2 mb-2">
-                            <code className="flex-1 px-3 py-2 bg-white border border-amber-200 rounded-lg text-sm font-mono break-all">{flash.api_key}</code>
-                            <button onClick={copyKey} className="px-3 py-2 bg-amber-600 text-white rounded-lg text-sm font-medium hover:bg-amber-700 shrink-0">
-                                {copied ? 'Copied!' : 'Copy'}
-                            </button>
+                        <div className="mb-3">
+                            <div className="text-xs font-semibold text-amber-900 uppercase tracking-wide mb-1">API Key</div>
+                            <div className="flex items-center gap-2">
+                                <code className="flex-1 px-3 py-2 bg-white border border-amber-200 rounded-lg text-sm font-mono break-all">{flash.api_key}</code>
+                                <button onClick={copyKey} className="px-3 py-2 bg-amber-600 text-white rounded-lg text-sm font-medium hover:bg-amber-700 shrink-0">
+                                    {copied ? 'Copied!' : 'Copy'}
+                                </button>
+                            </div>
                         </div>
                     )}
                     {flash?.signing_secret && (
-                        <div className="flex items-center gap-2">
-                            <code className="flex-1 px-3 py-2 bg-white border border-amber-200 rounded-lg text-sm font-mono break-all">{flash.signing_secret}</code>
-                            <button onClick={copySecret} className="px-3 py-2 bg-amber-600 text-white rounded-lg text-sm font-medium hover:bg-amber-700 shrink-0">
-                                {copiedSecret ? 'Copied!' : 'Copy'}
-                            </button>
+                        <div>
+                            <div className="text-xs font-semibold text-amber-900 uppercase tracking-wide mb-1">Signing Secret</div>
+                            <div className="flex items-center gap-2">
+                                <code className="flex-1 px-3 py-2 bg-white border border-amber-200 rounded-lg text-sm font-mono break-all">{flash.signing_secret}</code>
+                                <button onClick={copySecret} className="px-3 py-2 bg-amber-600 text-white rounded-lg text-sm font-medium hover:bg-amber-700 shrink-0">
+                                    {copiedSecret ? 'Copied!' : 'Copy'}
+                                </button>
+                            </div>
                         </div>
                     )}
                 </div>

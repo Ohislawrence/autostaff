@@ -7,7 +7,7 @@
                     <span class="font-display text-base font-black text-ink">Nomdal</span>
                 </div>
                 <p class="mt-4 max-w-xs text-sm leading-relaxed text-ink-dim">
-                    AI employees that actually work for your business — selling, supporting, booking, ordering, and handling admin around the clock.
+                    AI employees that find customers and run the repetitive work — selling, supporting, booking, ordering, and handling admin around the clock.
                 </p>
             </div>
             <div>

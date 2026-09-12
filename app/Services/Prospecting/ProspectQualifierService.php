@@ -51,6 +51,11 @@ class ProspectQualifierService
     protected function scoreWithAi(Prospect $prospect, $campaign): ?array
     {
         $offer = $campaign->offer ?: 'N/A';
+        $persona = $campaign->personaPromptSummary();
+
+        $personaBlock = $persona
+            ? "Buyer persona:\n{$persona}\n"
+            : '';
 
         $prompt = <<<PROMPT
 Score this prospect (1-10) for fit against the Ideal Customer Profile.
@@ -58,7 +63,7 @@ Score this prospect (1-10) for fit against the Ideal Customer Profile.
 Ideal Customer Profile:
 {$this->prettyJson($campaign->icp ?? [])}
 
-Offer being pitched:
+{$personaBlock}Offer being pitched:
 {$offer}
 
 Prospect:
@@ -72,8 +77,8 @@ Prospect:
 - LinkedIn: {$prospect->linkedin_url}
 
 Return ONLY valid JSON in this exact shape:
-{"score": 8, "breakdown": {"icp_fit": 8, "authority": 7, "reachability": 9, "intent_signal": 5}, "notes": "one concise sentence explaining the score"}
-Use 1 = terrible fit, 10 = perfect ICP match.
+{"score": 8, "breakdown": {"icp_fit": 8, "persona_fit": 8, "authority": 7, "reachability": 9, "intent_signal": 5}, "notes": "one concise sentence explaining the score"}
+Use 1 = terrible fit, 10 = perfect ICP + persona match.
 PROMPT;
 
         $options = [

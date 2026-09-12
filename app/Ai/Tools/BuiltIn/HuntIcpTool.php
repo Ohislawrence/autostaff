@@ -41,12 +41,17 @@ class HuntIcpTool extends BaseTool
             return $this->error('No tenant context available.');
         }
 
+        // Attribute the campaign to the AI employee that triggered this hunt
+        // (ToolExecutor injects the employee via `_employee`).
+        $employeeId = $parameters['_employee']?->id ?? null;
+
         $name = $parameters['campaign_name'] ?? 'SDR Outreach';
         $campaign = ProspectingCampaign::where('organization_id', $orgId)->where('name', $name)->first();
 
         if (! $campaign) {
             $campaign = ProspectingCampaign::create([
                 'organization_id' => $orgId,
+                'ai_employee_id' => $employeeId,
                 'name' => $name,
                 'icp' => [
                     'industry' => $parameters['industry'] ?? [],
@@ -64,6 +69,9 @@ class HuntIcpTool extends BaseTool
                 'compliance_regions' => ['us', 'uk'],
                 'status' => 'active',
             ]);
+        } elseif ($employeeId && ! $campaign->ai_employee_id) {
+            // Backfill attribution for a campaign created before the link existed.
+            $campaign->update(['ai_employee_id' => $employeeId]);
         }
 
         $result = app(ProspectHunterService::class)->hunt($campaign);

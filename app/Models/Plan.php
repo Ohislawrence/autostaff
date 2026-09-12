@@ -106,6 +106,10 @@ class Plan extends Model
      */
     public function getDisplayPrice(): string
     {
+        if ($this->slug === 'free') {
+            return 'Free';
+        }
+
         if ($this->price == 0) {
             return 'Custom';
         }

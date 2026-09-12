@@ -66,6 +66,10 @@ class RoleAndPermissionSeeder extends Seeder
             'crm.view',
             'crm.manage',
 
+            // Prospecting (outbound AI SDR)
+            'prospecting.view',
+            'prospecting.manage',
+
             // Products
             'products.view',
             'products.create',
@@ -155,6 +159,7 @@ class RoleAndPermissionSeeder extends Seeder
             'customers.view', 'customers.create', 'customers.update', 'customers.delete', 'customers.export',
             'leads.view', 'leads.create', 'leads.update', 'leads.delete', 'leads.manage-pipeline', 'leads.export',
             'crm.view', 'crm.manage',
+            'prospecting.view', 'prospecting.manage',
             'products.view', 'products.create', 'products.update', 'products.delete', 'products.manage-inventory',
             'orders.view', 'orders.create', 'orders.update', 'orders.delete', 'orders.manage-status',
             'appointments.view', 'appointments.create', 'appointments.update', 'appointments.delete',
@@ -178,6 +183,7 @@ class RoleAndPermissionSeeder extends Seeder
             'customers.view', 'customers.create', 'customers.update', 'customers.export',
             'leads.view', 'leads.create', 'leads.update', 'leads.manage-pipeline', 'leads.export',
             'crm.view', 'crm.manage',
+            'prospecting.view', 'prospecting.manage',
             'products.view', 'products.create', 'products.update',
             'orders.view', 'orders.create', 'orders.update',
             'appointments.view', 'appointments.create', 'appointments.update',
@@ -196,6 +202,7 @@ class RoleAndPermissionSeeder extends Seeder
             'customers.view', 'customers.create', 'customers.update',
             'leads.view', 'leads.create', 'leads.update', 'leads.manage-pipeline',
             'crm.view',
+            'prospecting.view',
             'products.view',
             'orders.view', 'orders.update',
             'appointments.view', 'appointments.create', 'appointments.update',

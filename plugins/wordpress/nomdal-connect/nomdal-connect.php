@@ -24,9 +24,15 @@ define('NOMDAL_CONNECT_PATH', plugin_dir_path(__FILE__));
 require_once NOMDAL_CONNECT_PATH.'includes/ApiResponse.php';
 require_once NOMDAL_CONNECT_PATH.'includes/ApiClient.php';
 require_once NOMDAL_CONNECT_PATH.'includes/Admin.php';
+require_once NOMDAL_CONNECT_PATH.'includes/Heartbeat.php';
 require_once NOMDAL_CONNECT_PATH.'includes/Actions/Leads.php';
 require_once NOMDAL_CONNECT_PATH.'includes/Actions/Woo.php';
+
+// Keep the heartbeat cron in sync when the plugin is activated/deactivated.
+register_activation_hook(__FILE__, [\Nomdal\Heartbeat::class, 'activate']);
+register_deactivation_hook(__FILE__, [\Nomdal\Heartbeat::class, 'deactivate']);
 
 \Nomdal\Admin::init();
 \Nomdal\Actions\Leads::init();
 \Nomdal\Actions\Woo::init();
+\Nomdal\Heartbeat::init();

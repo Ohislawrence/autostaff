@@ -12,7 +12,8 @@ class ProspectingCampaign extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'uuid', 'organization_id', 'name', 'description', 'icp', 'offer', 'tone',
+        'uuid', 'organization_id', 'ai_employee_id', 'name', 'description', 'icp', 'offer', 'tone',
+        'buyer_persona_id', 'buyer_persona_snapshot',
         'sender_name', 'sender_email', 'daily_limit', 'auto_outreach',
         'status', 'last_run_at', 'last_outreach_at',
         'postal_address', 'from_domain', 'compliance_regions', 'sourcing_rules',
@@ -21,7 +22,9 @@ class ProspectingCampaign extends Model
 
     protected $casts = [
         'organization_id' => 'integer',
+        'buyer_persona_id' => 'integer',
         'icp' => 'array',
+        'buyer_persona_snapshot' => 'array',
         'auto_outreach' => 'boolean',
         'daily_limit' => 'integer',
         'max_per_hour' => 'integer',
@@ -43,6 +46,32 @@ class ProspectingCampaign extends Model
     public function organization()
     {
         return $this->belongsTo(Organization::class);
+    }
+
+    public function aiEmployee()
+    {
+        return $this->belongsTo(AiEmployee::class, 'ai_employee_id');
+    }
+
+    public function buyerPersona()
+    {
+        return $this->belongsTo(BuyerPersona::class, 'buyer_persona_id');
+    }
+
+    /**
+     * Human-readable persona summary for injecting into AI prompts.
+     * Falls back to the live relationship when no snapshot is present.
+     */
+    public function personaPromptSummary(): ?string
+    {
+        if (! empty($this->buyer_persona_snapshot)) {
+            $persona = new BuyerPersona($this->buyer_persona_snapshot);
+            $persona->exists = false;
+
+            return $persona->toPromptSummary();
+        }
+
+        return $this->buyerPersona?->toPromptSummary();
     }
 
     public function prospects()

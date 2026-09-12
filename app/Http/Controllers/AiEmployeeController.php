@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\AiEmployee;
+use App\Services\Prospecting\CampaignCreator;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -13,7 +14,7 @@ class AiEmployeeController extends Controller
         $organization = $this->currentOrganization();
 
         $employees = $organization?->aiEmployees()
-            ->withCount(['conversations', 'leads'])
+            ->withCount(['conversations', 'leads', 'prospectingCampaigns as campaigns_count', 'prospects as prospects_count'])
             ->latest()
             ->get() ?? collect();
 
@@ -31,7 +32,69 @@ class AiEmployeeController extends Controller
             'templates' => $this->getTemplates(),
             'availableTools' => $this->getAvailableTools(),
             'knowledgeBases' => $knowledgeBases,
+            'personas' => \App\Models\BuyerPersona::where('organization_id', $this->currentOrganizationId())
+                ->orderBy('name')
+                ->get(['id', 'name', 'avatar']),
         ]);
+    }
+
+    /**
+     * Recommend an AI workforce (grouped by department) for this organization.
+     */
+    public function recommendWorkforce()
+    {
+        $organization = $this->currentOrganization();
+
+        if (! $organization) {
+            return redirect()->route('onboarding.show');
+        }
+
+        $recommendations = app(\App\Services\Ai\WorkforceService::class)
+            ->recommend($organization, $this->getTemplates());
+
+        return Inertia::render('AiEmployees/Recommend', [
+            'recommendations' => $recommendations,
+            'departments' => \App\Services\Ai\WorkforceService::DEPARTMENTS,
+        ]);
+    }
+
+    /**
+     * Deploy the selected AI workforce (create the employees).
+     */
+    public function deployWorkforce(Request $request)
+    {
+        $organization = $this->currentOrganization();
+
+        if (! $organization) {
+            return redirect()->route('onboarding.show');
+        }
+
+        $validated = $request->validate([
+            'templates' => 'required|array|min:1',
+            'templates.*' => 'string',
+        ]);
+
+        $templates = collect($this->getTemplates())
+            ->whereIn('id', $validated['templates'])
+            ->values()
+            ->all();
+
+        if (empty($templates)) {
+            return back()->with('error', 'No valid employees selected.');
+        }
+
+        $result = app(\App\Services\Ai\WorkforceService::class)->deploy($organization, $templates);
+
+        $count = count($result['created']);
+        $message = $count > 0
+            ? "Deployed {$count} AI employee" . ($count === 1 ? '' : 's') . ' to your workforce.'
+            : 'Your workforce is already at your plan limit.';
+
+        if (! empty($result['skipped'])) {
+            $message .= ' Skipped ' . count($result['skipped']) . ' at plan limit.';
+        }
+
+        return redirect()->route('ai-employees.index')->with('success', $message);
     }
 
     public function store(Request $request)
@@ -83,12 +146,26 @@ class AiEmployeeController extends Controller
             $validated['enabled_tools'] = $validToolIdentifiers;
         }
 
+        // Optional: wizard step for a first prospecting campaign.
+        $campaignInput = null;
+        if ($request->filled('campaign.name')) {
+            $request->validate($this->campaignRules());
+            $campaignInput = $request->input('campaign', []);
+        }
+
         $employee = $organization->aiEmployees()->create(array_merge($validated, [
             'is_active' => false,
         ]));
 
         if ($validToolIdentifiers !== null) {
             $this->syncEmployeeTools($employee, $validToolIdentifiers);
+        }
+
+        if ($campaignInput) {
+            $campaign = app(CampaignCreator::class)->create($campaignInput, $organization, $employee);
+
+            return redirect()->route('prospecting.campaigns')
+                ->with('success', "AI Employee '{$employee->name}' created with a first prospecting campaign \"{$campaign->name}\". Run a hunt to start finding prospects.");
         }
 
         return redirect()->route('ai-employees.index')
@@ -221,7 +298,8 @@ class AiEmployeeController extends Controller
             // Sales & Lead Generation
             [
                 'id' => 'sales',
-                'name' => 'Sales Representative',
+                'department' => 'revenue',
+                'name' => 'Alex',
                 'role' => 'Sales Representative',
                 'description' => 'Qualifies leads, provides product information, handles pricing inquiries, and closes sales. Perfect for e-commerce and B2B sales.',
                 'personality' => 'Enthusiastic, knowledgeable, and persuasive without being pushy',
@@ -233,7 +311,8 @@ class AiEmployeeController extends Controller
             // Customer Support
             [
                 'id' => 'support',
-                'name' => 'Customer Support Agent',
+                'department' => 'customer_experience',
+                'name' => 'Maya',
                 'role' => 'Customer Support Specialist',
                 'description' => 'Resolves customer issues, answers questions, provides order updates, and creates support tickets. Handles 80% of common support inquiries.',
                 'personality' => 'Empathetic, patient, solution-oriented, and reassuring',
@@ -245,7 +324,8 @@ class AiEmployeeController extends Controller
             // Receptionist
             [
                 'id' => 'receptionist',
-                'name' => 'Virtual Receptionist',
+                'department' => 'customer_experience',
+                'name' => 'Grace',
                 'role' => 'Receptionist',
                 'description' => 'Greets visitors, schedules appointments, provides business information, and routes inquiries. Your 24/7 front desk.',
                 'personality' => 'Warm, professional, organized, and welcoming',
@@ -257,7 +337,8 @@ class AiEmployeeController extends Controller
             // Lead Qualifier
             [
                 'id' => 'lead_qualifier',
-                'name' => 'Lead Qualification Specialist',
+                'department' => 'revenue',
+                'name' => 'Sam',
                 'role' => 'Lead Qualification Specialist',
                 'description' => 'Engages with prospects, qualifies leads using BANT criteria, schedules demos, and routes hot leads to sales team.',
                 'personality' => 'Curious, consultative, and goal-oriented',
@@ -269,7 +350,8 @@ class AiEmployeeController extends Controller
             // E-commerce Assistant
             [
                 'id' => 'ecommerce',
-                'name' => 'E-commerce Shopping Assistant',
+                'department' => 'operations',
+                'name' => 'Zoe',
                 'role' => 'Shopping Assistant',
                 'description' => 'Helps customers find products, compares options, provides recommendations, and handles cart & checkout assistance.',
                 'personality' => 'Helpful, patient, and product-savvy',
@@ -281,7 +363,8 @@ class AiEmployeeController extends Controller
             // HR Assistant
             [
                 'id' => 'hr_assistant',
-                'name' => 'HR Assistant',
+                'department' => 'administration',
+                'name' => 'Nina',
                 'role' => 'Human Resources Assistant',
                 'description' => 'Answers employee questions about policies, benefits, PTO, onboarding, and HR procedures. Handles confidential matters professionally.',
                 'personality' => 'Professional, discreet, knowledgeable, and supportive',
@@ -293,7 +376,8 @@ class AiEmployeeController extends Controller
             // Booking Agent
             [
                 'id' => 'booking_agent',
-                'name' => 'Booking & Reservations Agent',
+                'department' => 'operations',
+                'name' => 'Leo',
                 'role' => 'Booking Agent',
                 'description' => 'Handles reservations for restaurants, hotels, services, and events. Manages availability, confirmations, and modifications.',
                 'personality' => 'Organized, attentive, and hospitality-focused',
@@ -305,7 +389,8 @@ class AiEmployeeController extends Controller
             // Technical Support
             [
                 'id' => 'tech_support',
-                'name' => 'Technical Support Specialist',
+                'department' => 'administration',
+                'name' => 'Kai',
                 'role' => 'Technical Support Agent',
                 'description' => 'Troubleshoots technical issues, provides setup guidance, diagnoses problems, and escalates complex cases to engineering.',
                 'personality' => 'Patient, analytical, clear, and solution-focused',
@@ -317,13 +402,14 @@ class AiEmployeeController extends Controller
             // Sales Development Rep (outbound prospecting)
             [
                 'id' => 'sales_development_rep',
-                'name' => 'Sales Development Rep',
+                'department' => 'revenue',
+                'name' => 'Jordan',
                 'role' => 'Sales Development Rep',
                 'description' => 'Hunts the web for your Ideal Customer Profile, scores every lead 1-10, writes and sends hyper-personalized 2-pass AI outreach emails, and alerts you the moment a prospect replies.',
                 'personality' => 'Persistent, consultative, data-driven, and polite',
                 'tone' => 'professional',
-                'instructions' => "You are a Sales Development Rep (SDR) who runs outbound prospecting for the business.\n\n## Your Workflow:\n1. When asked to prospect, ask for the Ideal Customer Profile (industry, company size, geography, job titles, keywords, budget, pain points, and what is being offered).\n2. Call hunt_icp to find matching prospects and qualify them 1-10.\n3. Use get_prospecting_status to report progress.\n4. Draft outreach with draft_outreach, then send with send_outreach only for qualified prospects (score 7+).\n5. When a prospect replies, the human is alerted automatically.\n\n## Rules:\n- Respect compliance: do not send to suppressed/invalid contacts; the system enforces this automatically.\n- Keep emails short, personal, and with a single clear call-to-action.\n- If a prospect opts out, mark them and do not contact them again.\n- Escalate to a human with transfer_to_human when a prospect asks for a person or a demo/meeting needs scheduling.",
-                'tools' => ['hunt_icp', 'qualify_prospect', 'draft_outreach', 'send_outreach', 'get_prospecting_status', 'create_lead', 'transfer_to_human'],
+                'instructions' => "You are a Sales Development Rep (SDR) who runs outbound prospecting for the business.\n\n## Your Workflow:\n1. When asked to prospect, ask for the Ideal Customer Profile (industry, company size, geography, job titles, keywords, budget, pain points, and what is being offered).\n2. Call hunt_icp to find matching prospects and qualify them 1-10 — or run_outbound_pipeline to run the full hunt → research → outreach flow in one go.\n3. Use get_prospecting_status to report progress.\n4. Draft outreach with draft_outreach, then send with send_outreach only for qualified prospects (score 7+).\n5. When a prospect replies and is interested, book a meeting with book_meeting, send a proposal with generate_proposal, and create the opportunity with create_lead.\n\n## Rules:\n- Respect compliance: do not send to suppressed/invalid contacts; the system enforces this automatically.\n- Keep emails short, personal, and with a single clear call-to-action.\n- If a prospect opts out, mark them and do not contact them again.\n- Escalate to a human with transfer_to_human only when a prospect asks for a person or something you cannot handle.",
+                'tools' => ['hunt_icp', 'qualify_prospect', 'research_prospect', 'run_outbound_pipeline', 'draft_outreach', 'send_outreach', 'get_prospecting_status', 'create_lead', 'generate_proposal', 'book_meeting', 'transfer_to_human'],
             ],
         ];
 
@@ -337,6 +423,7 @@ class AiEmployeeController extends Controller
                 'id' => $template->id,
                 'name' => $template->name,
                 'role' => $template->role,
+                'department' => $template->department,
                 'description' => $template->description,
                 'personality' => $template->personality,
                 'tone' => $template->tone,
@@ -388,6 +475,22 @@ class AiEmployeeController extends Controller
                 'requires_confirmation' => false,
             ]])->all()
         );
+    }
+
+    protected function campaignRules(): array
+    {
+        return [
+            'campaign.name' => 'required|string|max:255',
+            'campaign.offer' => 'nullable|string',
+            'campaign.buyer_persona_id' => 'nullable|integer',
+            'campaign.icp_industry' => 'nullable|string',
+            'campaign.icp_company_size' => 'nullable|string',
+            'campaign.icp_geography' => 'nullable|string',
+            'campaign.icp_job_titles' => 'nullable|string',
+            'campaign.daily_limit' => 'nullable|integer|min:1|max:500',
+            'campaign.postal_address' => 'nullable|string',
+            'campaign.compliance_regions' => 'nullable|string',
+        ];
     }
 
     protected function getAvailableTools(): array

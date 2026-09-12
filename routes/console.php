@@ -20,3 +20,4 @@ Artisan::command('inspire', function () {
 \Illuminate\Support\Facades\Schedule::command('reports:generate monthly')->monthlyOn(1, '02:00');
 \Illuminate\Support\Facades\Schedule::command('prospecting:daily-run')->dailyAt('08:00')->withoutOverlapping();
 \Illuminate\Support\Facades\Schedule::command('prospecting:run-tenants')->hourly()->withoutOverlapping();
+\Illuminate\Support\Facades\Schedule::command('prospecting:followups')->dailyAt('09:00')->withoutOverlapping();

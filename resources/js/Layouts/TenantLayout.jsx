@@ -26,6 +26,12 @@ const navSections = [
         ],
     },
     {
+        section: 'GROWTH',
+        items: [
+            { name: 'Prospecting', href: '/prospecting', icon: TargetIcon, permission: 'prospecting.view' },
+        ],
+    },
+    {
         section: 'OPERATIONS',
         items: [
             { name: 'Products', href: '/products', icon: PackageIcon, permission: 'products.view' },

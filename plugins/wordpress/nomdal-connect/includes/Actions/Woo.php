@@ -8,8 +8,28 @@ class Woo
 {
     public static function init(): void
     {
+        // Checkout orders: synced after payment so the payment status is accurate.
         add_action('woocommerce_checkout_order_processed', [self::class, 'handleOrder']);
-        add_action('woocommerce_new_order', [self::class, 'handleOrder']);
+        // Non-checkout orders (admin / programmatic / REST): synced on creation.
+        add_action('woocommerce_new_order', [self::class, 'handleNonCheckoutOrder']);
+    }
+
+    /**
+     * Sync orders not created through the front-end checkout flow.
+     * Checkout orders are handled by woocommerce_checkout_order_processed.
+     */
+    public static function handleNonCheckoutOrder($orderId): void
+    {
+        if (! function_exists('wc_get_order')) {
+            return;
+        }
+
+        $order = wc_get_order($orderId);
+        if (! $order || $order->get_created_via() === 'checkout') {
+            return;
+        }
+
+        self::handleOrder($orderId);
     }
 
     public static function handleOrder($orderId): void
@@ -20,6 +40,11 @@ class Woo
 
         $order = wc_get_order($orderId);
         if (! $order) {
+            return;
+        }
+
+        // Safety net: never sync the same order more than once.
+        if ($order->get_meta('_nomdal_synced_at')) {
             return;
         }
 
@@ -43,7 +68,7 @@ class Woo
             ];
         }
 
-        $client->createOrder([
+        $response = $client->createOrder([
             'customer_id' => $customerId,
             'status' => $order->get_status(),
             'currency' => $order->get_currency(),
@@ -59,6 +84,11 @@ class Woo
             ],
             'items' => $items,
         ]);
+
+        if ($response->success) {
+            $order->update_meta_data('_nomdal_synced_at', time());
+            $order->save_meta_data();
+        }
     }
 
     protected static function syncCustomer(ApiClient $client, $order): ?int

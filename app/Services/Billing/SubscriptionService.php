@@ -65,6 +65,20 @@ class SubscriptionService
     }
 
     /**
+     * Subscribe an organization to the Free plan (no payment required).
+     */
+    public function subscribeFree(Organization $organization): Subscription
+    {
+        $plan = Plan::where('slug', 'free')->where('is_active', true)->first();
+
+        if (! $plan) {
+            throw new \RuntimeException('Free plan is not seeded.');
+        }
+
+        return $this->activate($organization, $plan, 'free', []);
+    }
+
+    /**
      * Activate a pending subscription using its Nomba payment reference.
      */
     public function activateFromReference(string $reference): ?Subscription

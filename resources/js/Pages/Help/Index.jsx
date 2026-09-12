@@ -93,6 +93,8 @@ const sections = [
                     <li><strong>Channels</strong> — Where the AI is available (web chat, email, WhatsApp).</li>
                     <li><strong>Active/Inactive</strong> — Toggle an AI Employee on or off anytime.</li>
                 </ul>
+                <h4 className="font-semibold text-gray-900 mt-4">Build a Workforce Fast</h4>
+                <p className="text-sm text-gray-600">Click <strong>✨ Recommend my workforce</strong> to get a suggested team grouped by department — 💰 Revenue, 💬 Customer Experience, 🛒 Operations, and 🧑‍💼 Administration — then deploy them in one click.</p>
                 <h4 className="font-semibold text-gray-900 mt-4">Where to Find Actions</h4>
                 <ul className="list-disc list-inside space-y-1 text-sm">
                     <li><strong>Activate/Deactivate</strong> — Button on the AI Employee card.</li>
@@ -442,6 +444,9 @@ const sections = [
         content: (
             <div className="space-y-3">
                 <p>Manage your subscription and view usage.</p>
+                <div className="bg-green-50 border border-green-100 rounded-xl p-4 text-sm text-green-700">
+                    <strong>Free plan:</strong> every new workspace starts on a <strong>Free</strong> plan — 1 AI Employee, limited monthly usage — so you can try Nomdal before upgrading.
+                </div>
                 <h4 className="font-semibold text-gray-900 mt-4">Plan Limits</h4>
                 <ul className="list-disc list-inside space-y-1 text-sm">
                     <li>Maximum AI Employees you can create.</li>
@@ -505,10 +510,29 @@ const sections = [
                     <ol className="list-decimal list-inside space-y-2 text-sm text-gray-700">
                         <li><strong>Hunt</strong> — finds prospects matching your Ideal Customer Profile (ICP).</li>
                         <li><strong>Qualify</strong> — scores every lead 1–10.</li>
+                        <li><strong>Research</strong> — explains why each prospect is a good fit, with evidence.</li>
                         <li><strong>Outreach</strong> — writes and sends hyper-personalized, 2-pass AI emails.</li>
+                        <li><strong>Follow-up</strong> — automatically re-touches prospects who don't reply (day 3 / 7 / 14).</li>
                         <li><strong>Alert</strong> — pings you the moment a prospect replies.</li>
+                        <li><strong>Convert</strong> — turns interested replies into an opportunity + quote + invoice.</li>
+                        <li><strong>Book meeting</strong> — schedules a meeting on your Google Calendar.</li>
                     </ol>
                 </div>
+
+                <div className="bg-amber-50 border border-amber-100 rounded-xl p-5">
+                    <h4 className="font-bold text-amber-800 mb-2">🔎 Connect web search (recommended)</h4>
+                    <p className="text-sm text-amber-700">For <strong>live</strong> prospect discovery, connect a search provider. Go to <strong>Prospecting → Search settings</strong> and use <strong>Nomdal's shared search</strong> or add your own <strong>Serper.dev</strong> / <strong>Brave Search</strong> API key. Without search, the SDR falls back to AI-generated suggestions.</p>
+                </div>
+
+                <h3 className="font-bold text-gray-900 text-lg">🗂️ Prospecting dashboard</h3>
+                <p className="text-sm text-gray-600">Everything runs from the <strong>Prospecting</strong> menu:</p>
+                <ul className="list-disc list-inside space-y-1 text-sm text-gray-700">
+                    <li><strong>Campaigns</strong> — define who to target (ICP + offer), then run Hunt / Qualify / Research / Outreach / Follow up.</li>
+                    <li><strong>Prospects</strong> — review ranked prospects, see why they're a good fit, and act on each one.</li>
+                    <li><strong>Buyer personas</strong> — define the decision-maker you're targeting (generate with AI or build manually) to sharpen hunt, scoring and outreach copy.</li>
+                    <li><strong>Search settings</strong> — use Nomdal's shared search or connect your own web-search API key.</li>
+                    <li><strong>Suppression list</strong> — manage do-not-contact entries.</li>
+                </ul>
 
                 <h3 className="font-bold text-gray-900 text-lg">🚀 Get started</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -532,9 +556,21 @@ const sections = [
                 <ul className="list-disc list-inside space-y-1 text-sm text-gray-700">
                     <li><strong>Hunt</strong> — uses live web search (when a search key is configured) plus DeepSeek to generate matching prospects.</li>
                     <li><strong>Qualify</strong> — scores each prospect 1–10; 7+ is treated as qualified.</li>
+                    <li><strong>Research</strong> — looks at the prospect's online presence and explains why they're a good fit.</li>
                     <li><strong>Outreach</strong> — drafts, then refines, a personalized email (the 2-pass flow), sent only to qualified prospects.</li>
+                    <li><strong>Follow-up</strong> — automatically re-touches prospects who haven't replied (day 3 / 7 / 14, up to 3 times).</li>
                     <li><strong>Alert</strong> — the instant a prospect replies, you're notified via Telegram/email.</li>
                 </ul>
+
+                <h3 className="font-bold text-gray-900 text-lg">💰 From reply to revenue</h3>
+                <p className="text-sm text-gray-600">When a prospect replies and is interested, Nomdal can close the loop automatically:</p>
+                <ul className="list-disc list-inside space-y-1 text-sm text-gray-700">
+                    <li><strong>Opportunity</strong> — a CRM lead is created (stage "Qualified", with an estimated value).</li>
+                    <li><strong>Quote</strong> — a proposal is generated at your service price (works for services, not just products).</li>
+                    <li><strong>Invoice</strong> — an invoice is created for the proposal.</li>
+                    <li><strong>Meeting</strong> — book a meeting on your Google Calendar (connect it under Integrations).</li>
+                </ul>
+                <p className="text-sm text-gray-600">You can also do these manually from a prospect's detail page (<strong>Convert to opportunity</strong> and <strong>Book meeting</strong>).</p>
 
                 <div className="bg-yellow-50 border border-yellow-100 rounded-xl p-5">
                     <h4 className="font-bold text-yellow-800 mb-2">📅 On-demand vs scheduled</h4>
@@ -627,6 +663,14 @@ const sections = [
                 <div>
                     <h4 className="font-semibold text-gray-900">How does outbound email stay compliant?</h4>
                     <p className="text-sm text-gray-600 mt-1">Every send passes an automatic compliance gate: do-not-contact list, email validation, sender identity + physical address, opt-out link, and rate limits. See the Compliance & Deliverability section.</p>
+                </div>
+                <div>
+                    <h4 className="font-semibold text-gray-900">How do I get live web search for my hunts?</h4>
+                    <p className="text-sm text-gray-600 mt-1">Go to <strong>Prospecting → Search settings</strong> and use Nomdal's shared search, or bring your own Serper.dev / Brave Search API key. Without search, Nomdal uses AI-generated prospect suggestions instead.</p>
+                </div>
+                <div>
+                    <h4 className="font-semibold text-gray-900">Can the SDR book meetings on my calendar?</h4>
+                    <p className="text-sm text-gray-600 mt-1">Yes — connect Google Calendar under <strong>Integrations</strong>, then use <strong>Book meeting</strong> on a prospect (or let the SDR call it when a prospect wants to meet).</p>
                 </div>
             </div>
         ),

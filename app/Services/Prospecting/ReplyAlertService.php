@@ -56,7 +56,47 @@ class ReplyAlertService
             'reply_summary' => Str::limit($body, 500, ''),
         ]);
 
+        // Classify intent and auto-convert interested replies into an
+        // opportunity + quotation + invoice.
+        $intent = $this->classifyIntent($subject . ' ' . $body);
+        $prospect->update(['intent' => $intent]);
+
+        if ($intent === 'interested') {
+            try {
+                app(\App\Services\Prospecting\ProspectConversionService::class)->convert($prospect);
+            } catch (\Throwable $e) {
+                Log::warning('Prospect conversion failed', [
+                    'prospect_id' => $prospect->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
         return $this->dispatchAlerts($prospect, $from, $subject, $body);
+    }
+
+    /**
+     * Classify an inbound reply as interested / not_interested / unknown.
+     */
+    protected function classifyIntent(string $text): string
+    {
+        $text = strtolower($text);
+
+        $negative = ['not interested', 'no thanks', 'not now', "don't want", 'dont want', 'stop', 'remove', 'unsubscribe', 'not a good time', 'not for us'];
+        foreach ($negative as $n) {
+            if (str_contains($text, $n)) {
+                return 'not_interested';
+            }
+        }
+
+        $positive = ['interested', 'tell me more', 'i want', "i'd like", 'how much', 'book', 'meeting', 'demo', "let's talk", 'lets talk', 'call me', 'send me', 'proposal', 'quote', 'price', 'yes', 'sounds good', 'great'];
+        foreach ($positive as $p) {
+            if (str_contains($text, $p)) {
+                return 'interested';
+            }
+        }
+
+        return 'unknown';
     }
 
     protected function looksLikeUnsubscribe(string $text): bool

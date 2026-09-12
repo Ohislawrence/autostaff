@@ -22,6 +22,7 @@
 
         <div class="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             @php $plans = [
+                ['Free', '₦0', '$0', '₦0', '$0', 'Try Nomdal free — no credit card required.', ['1 AI Employee', '100 messages / month', 'Web Chat only', '1 Knowledge Base (20 sources)', 'Basic lead tracking', 'Community support'], false, 'bg-white/40'],
                 ['Starter', '₦45,000', '$29', '₦37,500', '$24', 'For solo entrepreneurs testing AI.', ['1 AI Employee', 'Web Chat only', '500 messages / month', '1 Knowledge Base (50 sources)', 'Basic CRM (lead tracking)', '5 automations', '5 team members'], false, 'bg-white/40'],
                 ['Business', '₦150,000', '$99', '₦125,000', '$82', 'For growing businesses with multi-channel needs.', ['3 AI Employees', 'All Channels (Web, Email, WhatsApp)', '3,000 messages / month', 'Full CRM (scoring & pipeline)', 'Appointments & Commerce', '20 automations', '15 team members'], true, 'bg-ink'],
                 ['Professional', '₦375,000', '$249', '₦312,500', '$208', 'For established businesses and agencies.', ['10 AI Employees', 'All Channels + Webhooks', '10,000 messages / month', 'Custom Tools + REST API', '50 automations', '50 team members', '99.5% SLA'], false, 'bg-white/40'],
@@ -125,6 +126,7 @@
                 ['Can I switch plans later?', 'Yes. Upgrade or downgrade anytime, and we prorate changes.'],
                 ['Do you offer annual billing?', 'Yes — annual plans save about two months over paying monthly.'],
                 ['Can I pay in Naira?', 'Yes, we accept Naira via Nomba and USD for international customers.'],
+                ['Does it work on WhatsApp?', 'Yes — WhatsApp is native to Nomdal. Connect your number and your AI employee answers questions, takes orders, and books appointments there.'],
                 ['What happens if I exceed my limits?', 'We\'ll notify you before you hit a limit, and you can upgrade or add usage.'],
             ]; @endphp
             @foreach ($faqs as [$q, $a])

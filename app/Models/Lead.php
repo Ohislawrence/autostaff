@@ -13,7 +13,7 @@ class Lead extends Model
     use HasFactory, SoftDeletes, TenantAware;
 
     protected $fillable = [
-        'uuid', 'customer_id', 'ai_employee_id', 'conversation_id',
+        'uuid', 'organization_id', 'customer_id', 'ai_employee_id', 'conversation_id',
         'stage', 'source', 'score', 'score_breakdown', 'estimated_value',
         'product_interest', 'notes', 'metadata', 'converted_at', 'converted_by',
     ];

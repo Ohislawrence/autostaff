@@ -13,7 +13,7 @@ class AiEmployee extends Model
     use HasFactory, SoftDeletes, TenantAware;
 
     protected $fillable = [
-        'uuid', 'organization_id', 'name', 'role', 'description', 'avatar',
+        'uuid', 'organization_id', 'name', 'role', 'department', 'description', 'avatar',
         'system_instructions', 'personality', 'tone', 'language',
         'business_knowledge_ids', 'enabled_tools', 'allowed_channels',
         'working_hours', 'escalation_rules', 'response_settings',
@@ -66,5 +66,15 @@ class AiEmployee extends Model
     public function toolExecutions()
     {
         return $this->hasMany(ToolExecution::class);
+    }
+
+    public function prospectingCampaigns()
+    {
+        return $this->hasMany(ProspectingCampaign::class, 'ai_employee_id');
+    }
+
+    public function prospects()
+    {
+        return $this->hasManyThrough(Prospect::class, ProspectingCampaign::class, 'ai_employee_id', 'campaign_id', 'id', 'id');
     }
 }

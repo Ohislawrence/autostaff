@@ -62,6 +62,30 @@ class DashboardController extends Controller
             'resolution_rate' => $this->safePercent($org->conversations()->where('status', 'resolved')->count(), $org->conversations()->count()),
         ];
 
+        // Money-first metrics (this month)
+        $common['revenue_this_month'] = (float) $org->orders()
+            ->whereIn('status', ['confirmed', 'processing', 'shipped', 'delivered'])
+            ->whereMonth('created_at', now()->month)
+            ->sum('total');
+        $common['qualified_leads'] = $org->leads()->where('stage', 'qualified')->count();
+        $common['deals_won'] = $org->leads()->where('stage', 'won')->count();
+        $common['deals_won_this_month'] = $org->leads()
+            ->where('stage', 'won')
+            ->whereMonth('updated_at', now()->month)
+            ->count();
+        $common['pipeline_value'] = (float) $org->leads()
+            ->whereNotIn('stage', ['won', 'lost'])
+            ->sum('estimated_value');
+        $common['prospects_contacted'] = \App\Models\Prospect::where('organization_id', $org->id)
+            ->whereNotNull('contacted_at')
+            ->count();
+        $common['ai_work_completed'] = \App\Models\ToolExecution::where('organization_id', $org->id)
+            ->whereMonth('created_at', now()->month)
+            ->count();
+
+        // AI employee activity rollup
+        $common['ai_activity'] = $this->getAiActivity($org);
+
         // Chart trends
         $common['conversations_trend'] = $this->getTrend($org, 'conversations', 7);
         $common['leads_trend'] = $this->getTrend($org, 'leads', 7);
@@ -91,6 +115,39 @@ class DashboardController extends Controller
         ];
 
         return array_merge($stats, $common);
+    }
+
+    protected function getAiActivity(Organization $org): array
+    {
+        return $org->aiEmployees()->get()->map(function ($employee) use ($org) {
+            $campaignIds = \App\Models\ProspectingCampaign::where('organization_id', $org->id)
+                ->where('ai_employee_id', $employee->id)
+                ->pluck('id');
+
+            $prospectQuery = function () use ($org, $campaignIds) {
+                $query = \App\Models\Prospect::where('organization_id', $org->id);
+                if ($campaignIds->isEmpty()) {
+                    $query->whereRaw('1 = 0');
+                } else {
+                    $query->whereIn('campaign_id', $campaignIds);
+                }
+
+                return $query;
+            };
+
+            return [
+                'name' => $employee->name,
+                'avatar' => $employee->avatar ?? '🤖',
+                'role' => $employee->role ?? 'General',
+                'is_active' => $employee->is_active,
+                'conversations' => $employee->conversations()->count(),
+                'leads' => $employee->leads()->count(),
+                'prospects_found' => $prospectQuery()->count(),
+                'prospects_qualified' => $prospectQuery()->whereIn('status', ['qualified', 'contacted', 'replied', 'converted'])->count(),
+                'prospects_contacted' => $prospectQuery()->whereNotNull('contacted_at')->count(),
+                'prospects_replied' => $prospectQuery()->whereNotNull('replied_at')->count(),
+            ];
+        })->values()->toArray();
     }
 
     protected function getTrend(Organization $org, string $model, int $days): array

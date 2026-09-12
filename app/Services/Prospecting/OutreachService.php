@@ -155,6 +155,140 @@ class OutreachService
         return ['sent' => true, 'subject' => $subject, 'compliance' => $gate];
     }
 
+    /**
+     * Send a follow-up email to a prospect who hasn't replied yet.
+     */
+    public function sendFollowup(Prospect $prospect): array
+    {
+        if (! $prospect->email) {
+            return ['sent' => false, 'error' => 'Prospect has no email address.'];
+        }
+
+        if (empty($prospect->unsubscribe_token)) {
+            $prospect->update(['unsubscribe_token' => Str::random(40)]);
+        }
+
+        $gate = $this->gate->check($prospect);
+
+        if ($gate['status'] === 'blocked') {
+            $this->markCompliance($prospect, $gate);
+
+            return ['sent' => false, 'error' => 'Blocked by compliance: ' . implode(', ', $gate['blockers']), 'compliance' => $gate];
+        }
+
+        if ($gate['status'] === 'needs_review') {
+            $this->markCompliance($prospect, $gate);
+
+            return ['sent' => false, 'needs_review' => true, 'error' => 'Compliance review required before sending.', 'compliance' => $gate];
+        }
+
+        $content = $this->generateFollowupContent($prospect);
+
+        $senderName = $prospect->campaign->sender_name ?: $this->settings->senderName();
+        $senderEmail = $prospect->campaign->sender_email ?: $this->settings->senderEmail();
+        $postal = $prospect->campaign->postal_address ?: $this->settings->postalAddress();
+        $unsubscribeUrl = url('/prospecting/unsubscribe/' . $prospect->unsubscribe_token);
+
+        $body = $this->appendFooter($content['body'], $postal, $unsubscribeUrl);
+
+        try {
+            Mail::raw($body, function ($message) use ($prospect, $content, $senderName, $senderEmail, $unsubscribeUrl) {
+                $message->to($prospect->email, $prospect->name ?? null)
+                    ->subject($content['subject'])
+                    ->from($senderEmail, $senderName)
+                    ->replyTo($senderEmail, $senderName);
+                $message->getHeaders()->addTextHeader('List-Unsubscribe', "<{$unsubscribeUrl}>");
+                $message->getHeaders()->addTextHeader('List-Unsubscribe-Post', 'List-Unsubscribe=One-Click');
+            });
+        } catch (\Throwable $e) {
+            Log::error('Prospecting follow-up send failed', [
+                'prospect_id' => $prospect->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return ['sent' => false, 'error' => $e->getMessage()];
+        }
+
+        $prospect->increment('followup_count');
+        $prospect->update(['last_followup_at' => now()]);
+        $prospect->campaign->update(['last_outreach_at' => now()]);
+        $prospect->events()->create([
+            'organization_id' => $prospect->organization_id,
+            'type' => 'followup_sent',
+            'payload' => ['subject' => $content['subject'], 'n' => $prospect->followup_count],
+        ]);
+
+        return ['sent' => true, 'subject' => $content['subject'], 'compliance' => $gate];
+    }
+
+    /**
+     * Generate a follow-up email body + subject (a lighter, bump-style note).
+     */
+    protected function generateFollowupContent(Prospect $prospect): array
+    {
+        $campaign = $prospect->campaign;
+        $context = $this->prospectContext($prospect);
+        $offer = $campaign?->offer ?: 'N/A';
+        $icp = $this->prettyJson($campaign?->icp ?? []);
+        $tone = $campaign?->tone ?? 'professional';
+
+        $user = <<<PROMPT
+Write a short, polite follow-up to a cold email you already sent to this prospect.
+
+Campaign ICP:
+{$icp}
+
+Offer / value proposition:
+{$offer}
+
+Tone: {$tone}
+
+Prospect:
+{$context}
+
+Return ONLY valid JSON: {"subject": "...", "body": "..."}
+Rules: under 80 words, one clear call-to-action, reference the earlier email briefly, do not be pushy.
+PROMPT;
+
+        $options = ['temperature' => 0.6, 'max_tokens' => 800];
+        if ($model = $this->settings->deepseekModel()) {
+            $options['model'] = $model;
+        }
+
+        try {
+            $response = $this->ai->chat([
+                ['role' => 'system', 'content' => 'You are a B2B sales rep writing brief, polite follow-up emails.'],
+                ['role' => 'user', 'content' => $user],
+            ], $options);
+
+            $data = AiJson::parse($response->content);
+        } catch (\Throwable $e) {
+            $data = null;
+        }
+
+        if (! is_array($data) || empty($data['body'])) {
+            $data = [
+                'subject' => 'Re: ' . ($prospect->email_subject ?: 'Quick question'),
+                'body' => $this->fallbackBody($prospect, $campaign),
+            ];
+        }
+
+        $subject = trim((string) ($data['subject'] ?? 'Quick follow-up'));
+        $body = trim((string) ($data['body'] ?? ''));
+
+        $prospect->messages()->create([
+            'campaign_id' => $campaign->id,
+            'direction' => 'outbound',
+            'pass' => 3,
+            'subject' => $subject,
+            'body' => $body,
+            'status' => 'sent',
+            'sent_at' => now(),
+        ]);
+
+        return ['subject' => $subject, 'body' => $body];
+    }
+
     protected function markCompliance(Prospect $prospect, array $gate): void
     {
         $prospect->messages()
@@ -185,13 +319,16 @@ class OutreachService
         if ($pass === 1) {
             $system = 'You are an elite B2B outbound copywriter. You write short, human, hyper-personalized cold emails that never sound like spam.';
             $offer = $campaign->offer ?: 'N/A';
+            $persona = $campaign->personaPromptSummary();
+            $personaBlock = $persona ? "Buyer persona:\n{$persona}\n" : '';
+
             $user = <<<PROMPT
 Write a personalized cold email to this prospect.
 
 Campaign ICP:
 {$this->prettyJson($campaign->icp ?? [])}
 
-Offer / value proposition:
+{$personaBlock}Offer / value proposition:
 {$offer}
 
 Tone: {$campaign->tone}
@@ -200,7 +337,7 @@ Prospect:
 {$context}
 
 Return ONLY valid JSON: {"subject": "...", "body": "..."}
-Rules: 1 clear CTA, under 120 words, reference something specific about the prospect's company or role.
+Rules: 1 clear CTA, under 120 words, reference something specific about the prospect's company or role, and address the persona's pains/goals.
 PROMPT;
             $temperature = 0.8;
         } else {

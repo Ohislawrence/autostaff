@@ -1,7 +1,7 @@
 @extends('frontpage.layouts.app')
 
 @section('title', 'Product — Nomdal')
-@section('meta_description', 'Explore the Nomdal platform: create AI employees with roles, knowledge bases, and 13+ tools, then deploy them on WhatsApp, web chat, email, and API.')
+@section('meta_description', 'Explore the Nomdal platform: AI employees that find customers, qualify leads, and follow up automatically — then take orders and book appointments on WhatsApp, web, and email.')
 
 @section('content')
     {{-- Hero --}}
@@ -10,10 +10,10 @@
             <div class="reveal max-w-4xl">
                 <p class="font-mono text-xs uppercase tracking-widest text-forest">Product</p>
                 <h1 class="mt-4 font-display text-4xl font-black leading-[1.02] tracking-tight text-ink sm:text-6xl lg:text-7xl">
-                    One platform for your <span class="text-periwinkle">entire AI workforce</span>
+                    AI employees that <span class="text-periwinkle">find customers</span> and run the busy work
                 </h1>
                 <p class="mt-6 max-w-2xl text-lg leading-relaxed text-ink-dim sm:text-xl">
-                    Create AI employees with a role, personality, and knowledge base — then plug them into WhatsApp, web, and email to sell, support, and schedule around the clock.
+                    Nomdal hunts and qualifies prospects, follows up automatically, and takes the orders, bookings, and admin off your plate — on WhatsApp, web, and email.
                 </p>
                 <div class="mt-10 flex flex-wrap items-center gap-6">
                     <a href="{{ route('login') }}" class="inline-flex items-center gap-2 rounded-full bg-ink px-7 py-3.5 text-sm font-bold text-bone transition hover:bg-forest">Start free</a>
@@ -32,10 +32,10 @@
             </div>
             <div class="mt-14 grid gap-6 sm:grid-cols-2">
                 @php $blocks = [
-                    ['01', 'Configure', 'Define the role, personality, knowledge, and tools for each AI employee.', 'bg-peach/40'],
-                    ['02', 'Connect', 'Plug into WhatsApp, web chat, email, Shopify, and WooCommerce.', 'bg-citron/40'],
-                    ['03', 'Automate', 'Trigger AI actions from new leads, orders, and business events.', 'bg-blush/40'],
-                    ['04', 'Measure', 'Track conversations, resolution rates, and business impact in one dashboard.', 'bg-periwinkle/30'],
+                    ['01', 'Find Customers', 'Tell Nomdal what you sell and who you want. It hunts, qualifies, and contacts prospects automatically.', 'bg-peach/40'],
+                    ['02', 'Do the Work', 'Search products → price → order → invoice → payment → book delivery. Real workflows, not just chat.', 'bg-citron/40'],
+                    ['03', 'Connect', 'Plug into WhatsApp, web chat, email, and your business tools (Gmail, Calendar, CRM).', 'bg-blush/40'],
+                    ['04', 'Measure', 'Track revenue, qualified leads, deals won, and pipeline value in one dashboard.', 'bg-periwinkle/30'],
                 ]; @endphp
                 @foreach ($blocks as [$num, $title, $description, $tint])
                     <div class="reveal rounded-3xl border border-ink/10 {{ $tint }} p-8 transition hover:-translate-y-1 hover:border-ink/25">
@@ -77,9 +77,9 @@
         <div class="mx-auto max-w-7xl px-6 py-24 lg:py-32">
             <div class="grid gap-12 lg:grid-cols-2">
                 <div class="reveal">
-                    <p class="font-mono text-xs uppercase tracking-widest text-forest">Knowledge base + RAG</p>
+                    <p class="font-mono text-xs uppercase tracking-widest text-forest">Knowledge base</p>
                     <h2 class="mt-4 font-display text-4xl font-black tracking-tight text-ink sm:text-5xl">Answers grounded in your business</h2>
-                    <p class="mt-4 text-ink-dim">Upload PDFs, DOCX, TXT, CSVs, and URLs. Nomdal retrieves the right answer with semantic search — embeddings and cosine similarity — so every reply is accurate and on-brand.</p>
+                    <p class="mt-4 text-ink-dim">Upload PDFs, DOCX, CSVs, and URLs. Nomdal answers from your own content, so every reply is accurate and on-brand.</p>
                     <ul class="mt-6 space-y-3 text-sm text-ink-dim">
                         <li>· Ingest documents, spreadsheets, and web pages</li>
                         <li>· Semantic search with embeddings</li>
@@ -88,7 +88,7 @@
                 </div>
                 <div class="reveal" data-reveal-delay="100">
                     <p class="font-mono text-xs uppercase tracking-widest text-rust">Tool framework</p>
-                    <h2 class="mt-4 font-display text-4xl font-black tracking-tight text-ink sm:text-5xl">13+ tools that do real work</h2>
+                    <h2 class="mt-4 font-display text-4xl font-black tracking-tight text-ink sm:text-5xl">Tools that do the work</h2>
                     <p class="mt-4 text-ink-dim">AI employees don't just talk — they act. Search products, create leads and customers, place and cancel orders, book appointments, generate quotes and invoices, and transfer to a human when needed.</p>
                     <div class="mt-6 flex flex-wrap gap-2">
                         @foreach (['search_products', 'create_lead', 'create_order', 'get_order_status', 'schedule_appointment', 'create_task', 'transfer_to_human'] as $tool)
@@ -112,7 +112,7 @@
                 ['🌐', 'Web Chat', 'An embeddable widget that drops into any site in minutes.', 'bg-citron/40'],
                 ['✉️', 'Email', 'Handle inboxes and follow-ups automatically.', 'bg-blush/40'],
                 ['🔌', 'REST API', 'Build custom integrations on a documented v1 API.', 'bg-periwinkle/30'],
-                ['🧩', 'MCP Tools', 'Connect Gmail, Calendar, CRM, and Microsoft 365.', 'bg-purple/70'],
+                ['🧩', 'Business Tools', 'Connect Gmail, Calendar, CRM, and Microsoft 365.', 'bg-purple/70'],
                 ['🛒', 'Commerce', 'Sync products and orders from Shopify and WooCommerce.', 'bg-ltbeige'],
             ]; @endphp
             @foreach ($channels as [$icon, $title, $description, $tint])

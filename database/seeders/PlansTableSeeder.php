@@ -10,6 +10,32 @@ class PlansTableSeeder extends Seeder
     public function run(): void
     {
         Plan::updateOrCreate(
+            ['slug' => 'free'],
+            [
+                'name' => 'Free',
+                'description' => 'Try Nomdal free. Create one AI employee and see it work.',
+                'price' => 0,
+                'usd_price' => 0,
+                'currency' => 'NGN',
+                'billing_period' => 'monthly',
+                'max_ai_employees' => 1,
+                'max_messages_per_month' => 100,
+                'max_tool_calls_per_month' => 50,
+                'max_knowledge_sources' => 20,
+                'features' => [
+                    '1 AI Employee',
+                    '100 messages/month',
+                    'Web Chat only',
+                    '1 Knowledge Base (20 sources)',
+                    'Basic lead tracking',
+                    'Community support',
+                ],
+                'is_active' => true,
+                'sort_order' => 0,
+            ]
+        );
+
+        Plan::updateOrCreate(
             ['slug' => 'starter'],
             [
                 'name' => 'Starter',

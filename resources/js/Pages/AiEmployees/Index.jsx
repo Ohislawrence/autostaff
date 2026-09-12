@@ -1,6 +1,15 @@
 import { Head, Link, usePage, useForm } from '@inertiajs/react';
 import TenantLayout from '@/Layouts/TenantLayout';
 
+const DEPARTMENTS = {
+    revenue: { icon: '💰', label: 'Revenue' },
+    customer_experience: { icon: '💬', label: 'Customer Experience' },
+    operations: { icon: '🛒', label: 'Operations' },
+    administration: { icon: '🧑‍💼', label: 'Administration' },
+    other: { icon: '🤖', label: 'Other' },
+};
+const DEPT_ORDER = ['revenue', 'customer_experience', 'operations', 'administration', 'other'];
+
 export default function Index({ employees }) {
     const { flash } = usePage().props;
     const { post } = useForm();
@@ -9,6 +18,13 @@ export default function Index({ employees }) {
         if (!employee.is_active) return { text: 'Inactive', class: 'bg-gray-100 text-gray-600' };
         return { text: 'Active', class: 'bg-green-100 text-green-700' };
     };
+
+    const deptOf = (e) => (DEPARTMENTS[e.department] ? e.department : 'other');
+    const sortedEmployees = [...employees].sort((a, b) => {
+        const da = DEPT_ORDER.indexOf(deptOf(a));
+        const db = DEPT_ORDER.indexOf(deptOf(b));
+        return (da - db) || (a.name || '').localeCompare(b.name || '');
+    });
 
     return (
         <TenantLayout header="AI Employees">
@@ -36,15 +52,23 @@ export default function Index({ employees }) {
                 <p className="text-gray-500 text-sm">
                     Manage your AI employees — configure their roles, tools, and channels.
                 </p>
-                <Link
-                    href="/ai-employees/create"
-                    className="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-medium hover:from-blue-700 hover:to-blue-800 transition-all shadow-md shadow-blue-200 text-sm"
-                >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4.5v15m7.5-7.5h-15" />
-                    </svg>
-                    Create AI Employee
-                </Link>
+                <div className="flex items-center gap-2">
+                    <Link
+                        href="/ai-employees/workforce"
+                        className="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-blue-200 text-blue-700 rounded-xl font-medium hover:bg-blue-50 transition-all text-sm"
+                    >
+                        ✨ Recommend my workforce
+                    </Link>
+                    <Link
+                        href="/ai-employees/create"
+                        className="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-medium hover:from-blue-700 hover:to-blue-800 transition-all shadow-md shadow-blue-200 text-sm"
+                    >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4.5v15m7.5-7.5h-15" />
+                        </svg>
+                        Create AI Employee
+                    </Link>
+                </div>
             </div>
 
             {/* Employees Grid */}
@@ -68,7 +92,7 @@ export default function Index({ employees }) {
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {employees.map((employee) => {
+                    {sortedEmployees.map((employee) => {
                         const status = getStatusBadge(employee);
                         return (
                             <div key={employee.id} className="bg-white/80 backdrop-blur rounded-xl shadow-lg border border-blue-100 p-6 hover:shadow-xl hover:border-blue-200 transition-all">
@@ -79,7 +103,7 @@ export default function Index({ employees }) {
                                         </div>
                                         <div>
                                             <h3 className="font-semibold text-gray-900 text-sm">{employee.name}</h3>
-                                            <p className="text-xs text-gray-500">{employee.role}</p>
+                                            <p className="text-xs text-gray-500">{employee.role} · {DEPARTMENTS[deptOf(employee)].icon} {DEPARTMENTS[deptOf(employee)].label}</p>
                                         </div>
                                     </div>
                                     <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${status.class}`}>
@@ -94,6 +118,8 @@ export default function Index({ employees }) {
                                 <div className="flex items-center gap-4 text-xs text-gray-400 mb-4">
                                     <span>💬 {employee.conversations_count || 0} chats</span>
                                     <span>🎯 {employee.leads_count || 0} leads</span>
+                                    <span>📋 {employee.campaigns_count || 0} campaigns</span>
+                                    <span>👥 {employee.prospects_count || 0} prospects</span>
                                 </div>
 
                                 <div className="flex items-center gap-2 pt-3 border-t border-gray-100">
@@ -118,6 +144,12 @@ export default function Index({ employees }) {
                                         className="px-2 py-1.5 text-xs rounded-lg bg-gradient-to-r from-amber-400 to-amber-500 text-white font-medium hover:from-amber-500 hover:to-amber-600 transition-all shadow-sm flex-1 text-center"
                                     >
                                         Channels
+                                    </Link>
+                                    <Link
+                                        href={`/prospecting/campaigns?employee=${employee.id}`}
+                                        className="px-2 py-1.5 text-xs rounded-lg bg-indigo-100 text-indigo-700 font-medium hover:bg-indigo-200 transition-colors flex-1 text-center"
+                                    >
+                                        Prospecting
                                     </Link>
                                 </div>
                             </div>

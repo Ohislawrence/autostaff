@@ -13,11 +13,9 @@ class WebSearchService
      *
      * @return array<int, array{title: string, url: string, snippet: string}>
      */
-    public function search(string $query, int $limit = 10): array
+    public function search(string $query, int $limit = 10, ?int $organizationId = null): array
     {
-        $settings = ProspectingSettings::instance();
-        $provider = $settings->search_provider;
-        $key = $settings->search_api_key;
+        [$provider, $key] = $this->resolveCredentials($organizationId);
 
         if ($provider === 'none' || empty($key)) {
             return [];
@@ -39,11 +37,53 @@ class WebSearchService
         }
     }
 
-    public function isConfigured(): bool
+    public function isConfigured(?int $organizationId = null): bool
+    {
+        [$provider, $key] = $this->resolveCredentials($organizationId);
+
+        return $provider !== 'none' && ! empty($key);
+    }
+
+    /**
+     * Resolve the active search provider + key for a tenant.
+     *
+     * Precedence:
+     *  1. Tenant explicitly configured "platform" → platform shared credentials.
+     *  2. Tenant configured their own Serper/Brave key → tenant credentials.
+     *  3. Tenant explicitly configured "none" → no search.
+     *  4. No tenant row yet → platform shared credentials (sensible default).
+     *
+     * @return array{0: string, 1: ?string} [provider, api_key]
+     */
+    protected function resolveCredentials(?int $organizationId): array
+    {
+        if ($organizationId) {
+            $tenant = \App\Models\TenantSearchSettings::where('organization_id', $organizationId)->first();
+
+            if ($tenant) {
+                if ($tenant->provider === \App\Models\TenantSearchSettings::PROVIDER_PLATFORM) {
+                    return $this->platformCredentials();
+                }
+
+                if ($tenant->provider !== \App\Models\TenantSearchSettings::PROVIDER_NONE && ! empty($tenant->api_key)) {
+                    return [$tenant->provider, $tenant->api_key];
+                }
+
+                return [\App\Models\TenantSearchSettings::PROVIDER_NONE, null];
+            }
+        }
+
+        return $this->platformCredentials();
+    }
+
+    /**
+     * @return array{0: string, 1: ?string} [provider, api_key]
+     */
+    protected function platformCredentials(): array
     {
         $settings = ProspectingSettings::instance();
 
-        return $settings->search_provider !== 'none' && ! empty($settings->search_api_key);
+        return [$settings->search_provider, $settings->search_api_key];
     }
 
     protected function serper(string $query, int $limit, string $key): array

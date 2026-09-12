@@ -13,6 +13,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(ToolsTableSeeder::class);
         $this->call(RoleAndPermissionSeeder::class);
+        $this->call(BuyerPersonaTemplateSeeder::class);
 
         // Create Platform Owner (super admin — no organization needed)
         $platformOwner = User::create([

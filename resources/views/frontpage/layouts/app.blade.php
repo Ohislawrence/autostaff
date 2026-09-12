@@ -5,16 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>@yield('title', 'Nomdal — AI Employees for Your Business')</title>
-    <meta name="description" content="@yield('meta_description', 'Nomdal builds AI employees that handle conversations, orders, appointments, and follow-ups — built for businesses in Nigeria and everywhere else.')">
+    <title>@yield('title', 'Nomdal — AI Employees That Run Repetitive Business Work')</title>
+    <meta name="description" content="@yield('meta_description', 'Nomdal finds potential customers, qualifies them, and follows up automatically. AI employees that run repetitive business work — on WhatsApp, web, and email.')">
     <link rel="canonical" href="{{ url()->current() }}">
 
     {{-- Open Graph --}}
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Nomdal">
     <meta property="og:locale" content="en_US">
-    <meta property="og:title" content="@yield('title', 'Nomdal — AI Employees for Your Business')">
-    <meta property="og:description" content="@yield('meta_description', 'Nomdal builds AI employees that handle conversations, orders, appointments, and follow-ups — built for businesses in Nigeria and everywhere else.')">
+    <meta property="og:title" content="@yield('title', 'Nomdal — AI Employees That Run Repetitive Business Work')">
+    <meta property="og:description" content="@yield('meta_description', 'Nomdal finds potential customers, qualifies them, and follows up automatically. AI employees that run repetitive business work — on WhatsApp, web, and email.')">
     <meta property="og:url" content="{{ url()->current() }}">
     <meta property="og:image" content="{{ url('/images/og-image2.png') }}">
     <meta property="og:image:width" content="1200">
@@ -22,13 +22,13 @@
 
     {{-- Twitter --}}
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="@yield('title', 'Nomdal — AI Employees for Your Business')">
-    <meta name="twitter:description" content="@yield('meta_description', 'Nomdal builds AI employees that handle conversations, orders, appointments, and follow-ups — built for businesses in Nigeria and everywhere else.')">
+    <meta name="twitter:title" content="@yield('title', 'Nomdal — AI Employees That Run Repetitive Business Work')">
+    <meta name="twitter:description" content="@yield('meta_description', 'Nomdal finds potential customers, qualifies them, and follows up automatically. AI employees that run repetitive business work — on WhatsApp, web, and email.')">
     <meta name="twitter:image" content="{{ url('/images/og-image2.png') }}">
 
     <meta name="theme-color" content="#e8ebff">
 
-    <link rel="icon" href="{{ asset('favicon.ico') }}">
+    <link rel="icon" href="{{ asset('images/nomdal-favicon.png') }}">
 
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=archivo:500,600,700,800,900|inter:400,500,600|jetbrains-mono:400,500" rel="stylesheet" />

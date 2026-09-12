@@ -1,7 +1,7 @@
 @extends('frontpage.layouts.app')
 
-@section('title', 'Nomdal — AI Employees for Your Business')
-@section('meta_description', 'Nomdal isn\'t just where customers talk to your business. It\'s where AI employees actually work — finding leads, taking orders, booking appointments, and following up, 24/7.')
+@section('title', 'Nomdal — AI Employees That Run Repetitive Business Work')
+@section('meta_description', 'Nomdal finds potential customers, qualifies them, and follows up automatically. AI employees that take orders, book appointments, and run the busy work — 24/7.')
 
 @section('content')
     {{-- Hero --}}
@@ -30,15 +30,13 @@
             </p>
 
             <h1 class="reveal mt-6 max-w-5xl font-display text-5xl font-black leading-[0.98] tracking-tight text-ink sm:text-7xl lg:text-8xl" data-reveal-delay="60">
-                AI employees that work your
-                <span class="text-periwinkle">front desk</span>,
-                <span class="text-lime">sales</span>, and
-                <span class="text-rust">support</span>
-                — 24/7.
+                AI employees that 
+                <span class="text-periwinkle">find customers and</span>
+                <span class="text-lime">do the work
             </h1>
 
             <p class="reveal mt-8 max-w-2xl text-lg leading-relaxed text-ink-dim sm:text-xl" data-reveal-delay="120">
-                Nomdal isn't just where customers talk to your business. It's where AI employees actually work for your business — finding leads, taking orders, booking appointments, and following up, 24/7.
+                Nomdal finds potential customers, qualifies them, follows up automatically, and handles the repetitive work that happens after the sale — from bookings and orders to invoices and customer support.
             </p>
 
             <div class="reveal mt-10 flex flex-wrap items-center gap-6" data-reveal-delay="180">
@@ -56,13 +54,43 @@
         </div>
     </section>
 
+    {{-- WhatsApp demo --}}
+    <section class="mx-auto max-w-7xl px-6 py-24 lg:py-32">
+        <div class="grid gap-12 lg:grid-cols-2 lg:items-center">
+            <div class="reveal">
+                <p class="font-mono text-xs uppercase tracking-widest text-forest">WhatsApp-first</p>
+                <h2 class="mt-4 font-display text-4xl font-black tracking-tight text-ink sm:text-5xl">Your customers are already on WhatsApp</h2>
+                <p class="mt-4 text-lg text-ink-dim">Connect your number and Nomdal handles the repetitive work — answering questions, checking stock, taking orders, and sending payment links. Around the clock.</p>
+                <div class="mt-8 flex flex-wrap gap-4">
+                    <a href="{{ route('login') }}" class="inline-flex items-center gap-2 rounded-full bg-ink px-7 py-3.5 text-sm font-bold text-bone transition hover:bg-forest">Connect WhatsApp</a>
+                    <a href="{{ route('frontpage.product') }}" class="link-underline text-sm font-bold text-ink">See all channels →</a>
+                </div>
+            </div>
+            <div class="reveal rounded-3xl border border-ink/10 bg-white/60 p-6" data-reveal-delay="100">
+                <div class="mb-4 flex items-center gap-2 border-b border-ink/10 pb-3">
+                    <div class="flex h-8 w-8 items-center justify-center rounded-full bg-[#25D366] text-sm font-bold text-white">N</div>
+                    <div>
+                        <p class="text-sm font-bold text-ink">Nomdal</p>
+                        <p class="text-[11px] text-ink-faint">online · replies instantly</p>
+                    </div>
+                </div>
+                <div class="space-y-3">
+                    <div class="ml-auto max-w-[80%] rounded-2xl rounded-tr-sm bg-[#DCF8C6] px-4 py-2 text-sm text-ink">Do you have the blue sofa in stock?</div>
+                    <div class="max-w-[80%] rounded-2xl rounded-tl-sm border border-ink/10 bg-white px-4 py-2 text-sm text-ink">Yes! We have 3 available. It's ₦250,000.</div>
+                    <div class="ml-auto max-w-[80%] rounded-2xl rounded-tr-sm bg-[#DCF8C6] px-4 py-2 text-sm text-ink">I'll take one. Can I pay now?</div>
+                    <div class="max-w-[80%] rounded-2xl rounded-tl-sm border border-ink/10 bg-white px-4 py-2 text-sm text-ink">Done ✅ Order #1042 created. Here's your payment link → nomba.pay/1042</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     {{-- Capability ticker --}}
     <section class="overflow-hidden border-y border-ink/10 bg-purple/50 py-5">
         <div class="flex whitespace-nowrap ticker-track">
-            @foreach (['Conversations', 'Appointments', 'Orders', 'Invoices', 'Leads', 'WhatsApp', 'Shopify', 'WooCommerce', 'Follow-ups', 'Reports', 'Analytics', 'Automations'] as $item)
+            @foreach (['Prospects', 'Qualified Leads', 'Outreach', 'Follow-ups', 'Orders', 'Invoices', 'Appointments', 'WhatsApp', 'Shopify', 'WooCommerce', 'Reports', 'Automations'] as $item)
                 <span class="mx-8 font-display text-2xl font-black uppercase tracking-tight text-ink">{{ $item }} <span class="text-lime">●</span></span>
             @endforeach
-            @foreach (['Conversations', 'Appointments', 'Orders', 'Invoices', 'Leads', 'WhatsApp', 'Shopify', 'WooCommerce', 'Follow-ups', 'Reports', 'Analytics', 'Automations'] as $item)
+            @foreach (['Prospects', 'Qualified Leads', 'Outreach', 'Follow-ups', 'Orders', 'Invoices', 'Appointments', 'WhatsApp', 'Shopify', 'WooCommerce', 'Reports', 'Automations'] as $item)
                 <span class="mx-8 font-display text-2xl font-black uppercase tracking-tight text-ink">{{ $item }} <span class="text-lime">●</span></span>
             @endforeach
         </div>
@@ -98,12 +126,12 @@
 
         <div class="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             @php $features = [
-                ['🤖', 'AI Employees', 'Configure roles, personality, knowledge, and tools for every AI teammate.', 'bg-peach/40'],
-                ['💬', 'Conversations', 'Answer questions and resolve issues on WhatsApp, web chat, and email — 24/7.', 'bg-citron/40'],
+                ['🎯', 'Find Customers', 'Nomdal hunts, qualifies, and contacts prospects that match your ideal customer profile.', 'bg-peach/40'],
+                ['💌', 'Follow-ups', 'Automated outreach and reminders that keep leads warm without you lifting a finger.', 'bg-citron/40'],
+                ['🛒', 'Sales & Orders', 'Take orders and send invoices from WhatsApp, web, WooCommerce, and Shopify.', 'bg-periwinkle/30'],
                 ['📅', 'Appointments', 'Schedule, reschedule, and confirm bookings with real availability and conflict checks.', 'bg-blush/40'],
-                ['🛒', 'Sales & Orders', 'Capture leads and create orders from WooCommerce and Shopify — automatically.', 'bg-periwinkle/30'],
-                ['⚡', 'Automations', 'Trigger AI actions from new leads, orders, and other business events.', 'bg-purple/70'],
-                ['📈', 'Analytics', 'Measure conversations, resolution rates, and the impact on your business.', 'bg-ltbeige'],
+                ['🤖', 'AI Employees', 'Configure roles, personality, knowledge, and tools for every AI teammate.', 'bg-purple/70'],
+                ['📈', 'Analytics', 'See revenue, qualified leads, deals won, and pipeline value at a glance.', 'bg-ltbeige'],
             ]; @endphp
 
             @foreach ($features as [$icon, $title, $description, $tint])
@@ -125,8 +153,8 @@
             </div>
             <div class="mt-14 grid gap-6 md:grid-cols-3">
                 @php $pillars = [
-                    ['01', 'Does the work', 'Creates leads and orders, books appointments, and sends invoices & follow-ups — 13+ tools, not canned replies.', 'bg-peach/40'],
-                    ['02', 'Lives where customers are', 'WhatsApp, web chat, email, REST API, and MCP tools like Gmail, Calendar, and CRM.', 'bg-citron/40'],
+                    ['01', 'Finds customers & does the work', 'Hunts and qualifies prospects, creates leads and orders, books appointments, and sends follow-ups — not canned replies.', 'bg-peach/40'],
+                    ['02', 'Lives where your customers are', 'WhatsApp, web chat, email, and your business tools — connect Gmail, Calendar, and your CRM.', 'bg-citron/40'],
                     ['03', 'Enterprise trust, SMB price', 'Tenant isolation, role-based access, audit logs, and prompt-injection defense — from $29/mo.', 'bg-blush/40'],
                 ]; @endphp
                 @foreach ($pillars as [$num, $title, $description, $tint])

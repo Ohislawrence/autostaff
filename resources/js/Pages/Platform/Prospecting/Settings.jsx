@@ -62,7 +62,7 @@ export default function ProspectingSettings({ settings, webhookUrl, webhookSecre
                             <option value="brave">Brave Search</option>
                         </select>
                     </div>
-                    <div className="col-span-2"><label className={label}>Search API Key</label><input className={field} type="password" placeholder={settings.has_search_key ? 'Configured — leave blank to keep' : 'Serper.dev or Brave API key'} value={data.search_api_key} onChange={(e) => setData('search_api_key', e.target.value)} /></div>
+                    <div className="col-span-2"><label className={label}>Search API Key</label><input className={field} type="password" placeholder={settings.has_search_key ? 'Configured — leave blank to keep' : 'Serper.dev or Brave API key'} value={data.search_api_key} onChange={(e) => setData('search_api_key', e.target.value)} /><p className="text-xs text-gray-400 mt-1">Shared platform search. Tenants can use this or connect their own key.</p></div>
                 </div>
 
                 <h3 className="font-semibold text-gray-900 mb-4">Automation & Limits</h3>
