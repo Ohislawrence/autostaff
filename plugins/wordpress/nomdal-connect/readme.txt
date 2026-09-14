@@ -12,11 +12,15 @@ Connect your WordPress site to your Nomdal AI Employee.
 
 == Description ==
 
-Nomdal Connect links your WordPress site to your Nomdal platform through a secure, scoped API key. It can:
+Nomdal Connect links your WordPress site to your Nomdal platform through a secure, scoped API key, so your AI Employee always has your leads and orders in view.
 
-* Send contact form submissions to Nomdal as leads.
-* Sync WooCommerce orders and customers to Nomdal.
-* Report in with a heartbeat so you can see when the site last connected.
+* Send Contact Form 7 submissions to Nomdal as leads.
+* Sync WooCommerce orders and customers to Nomdal (find-or-create plus order line items, de-duplicated).
+* Report in with an hourly heartbeat so you can see when the site last connected.
+* Secure by default: scoped Bearer API key plus optional HMAC-SHA256 request signing.
+* Settings page with a one-click Test Connection.
+
+Requirements: WordPress 5.6+ and PHP 7.4+. Contact Form 7 and WooCommerce integrations activate automatically when those plugins are installed.
 
 == Installation ==
 

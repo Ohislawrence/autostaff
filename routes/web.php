@@ -199,6 +199,25 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/platform/plugin-versions/{version}/publish', [\App\Http\Controllers\Platform\PluginController::class, 'publishVersion'])->name('platform.plugin-versions.publish');
         Route::post('/platform/plugin-versions/{version}/deprecate', [\App\Http\Controllers\Platform\PluginController::class, 'deprecateVersion'])->name('platform.plugin-versions.deprecate');
         Route::delete('/platform/plugin-versions/{version}', [\App\Http\Controllers\Platform\PluginController::class, 'destroyVersion'])->name('platform.plugin-versions.destroy');
+
+        // Operator Command Center (marketing, tasks, achievements, goals)
+        Route::get('/platform/marketing', [\App\Http\Controllers\Platform\GrowthController::class, 'marketing'])->name('platform.marketing');
+        Route::post('/platform/marketing/channels', [\App\Http\Controllers\Platform\GrowthController::class, 'storeChannel'])->name('platform.marketing.channels.store');
+        Route::put('/platform/marketing/channels/{channel}', [\App\Http\Controllers\Platform\GrowthController::class, 'updateChannel'])->name('platform.marketing.channels.update');
+        Route::delete('/platform/marketing/channels/{channel}', [\App\Http\Controllers\Platform\GrowthController::class, 'destroyChannel'])->name('platform.marketing.channels.destroy');
+        Route::post('/platform/marketing/channels/{channel}/metrics', [\App\Http\Controllers\Platform\GrowthController::class, 'storeMetric'])->name('platform.marketing.metrics.store');
+
+        Route::get('/platform/tasks', [\App\Http\Controllers\Platform\TaskController::class, 'index'])->name('platform.tasks');
+        Route::post('/platform/tasks', [\App\Http\Controllers\Platform\TaskController::class, 'store'])->name('platform.tasks.store');
+        Route::post('/platform/tasks/{task}/toggle', [\App\Http\Controllers\Platform\TaskController::class, 'toggle'])->name('platform.tasks.toggle');
+        Route::delete('/platform/tasks/{task}', [\App\Http\Controllers\Platform\TaskController::class, 'destroy'])->name('platform.tasks.destroy');
+
+        Route::get('/platform/achievements', [\App\Http\Controllers\Platform\GrowthController::class, 'achievements'])->name('platform.achievements');
+
+        Route::get('/platform/goals', [\App\Http\Controllers\Platform\GrowthController::class, 'goals'])->name('platform.goals');
+        Route::post('/platform/goals', [\App\Http\Controllers\Platform\GrowthController::class, 'storeGoal'])->name('platform.goals.store');
+        Route::put('/platform/goals/{goal}', [\App\Http\Controllers\Platform\GrowthController::class, 'updateGoal'])->name('platform.goals.update');
+        Route::delete('/platform/goals/{goal}', [\App\Http\Controllers\Platform\GrowthController::class, 'destroyGoal'])->name('platform.goals.destroy');
     });
 
     // Support session exit (accessible by any authenticated user)

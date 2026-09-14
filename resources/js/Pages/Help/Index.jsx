@@ -498,6 +498,43 @@ const sections = [
         ),
     },
     {
+        id: 'shopify-addon',
+        title: 'Shopify Add-on',
+        icon: '🛍️',
+        content: (
+            <div className="space-y-5">
+                <p className="text-gray-700">Connect your Shopify store to your Nomdal AI Employee with the official <strong>Nomdal Connect for Shopify</strong> app. It syncs orders and customers straight into Nomdal.</p>
+
+                <div className="bg-amber-50 border border-amber-100 rounded-xl p-4">
+                    <p className="text-sm text-amber-800">💡 <strong>Note:</strong> Shopify works differently from WordPress — instead of a plugin you install inside the site, it uses an <strong>app</strong> that receives <strong>webhooks</strong>. The Nomdal API it calls is exactly the same.</p>
+                </div>
+
+                <div className="bg-primary-50 border border-primary-100 rounded-xl p-5">
+                    <h3 className="font-bold text-primary-800 text-lg mb-3">📥 Install & Connect</h3>
+                    <ol className="list-decimal list-inside space-y-3 text-sm text-gray-700">
+                        <li><strong>Create a Shopify custom app</strong> → In Shopify Admin, go to <strong>Settings → Apps and sales channels → Develop apps</strong>, create an app, and grant read access to <strong>Orders</strong> and <strong>Customers</strong>. Install it and copy the <strong>Admin API access token</strong>.</li>
+                        <li><strong>Get your Nomdal credentials</strong> → In Nomdal, open <code className="bg-white px-1 rounded text-xs">Plugins</code>, install <strong>Nomdal Connect for Shopify</strong>, and copy your <strong>API key</strong> and <strong>signing secret</strong>.</li>
+                        <li><strong>Download & deploy</strong> → Download the package and upload the <code className="bg-white px-1 rounded text-xs">nomdal-connect</code> folder to any PHP 7.4+ host. Copy <code className="bg-white px-1 rounded text-xs">config.example.php</code> to <code className="bg-white px-1 rounded text-xs">config.php</code> and fill in your Shopify + Nomdal details.</li>
+                        <li><strong>Register webhooks</strong> → In your custom app, add webhook subscriptions for <strong>orders/create</strong> and <strong>customers/create</strong>, pointing at your <code className="bg-white px-1 rounded text-xs">webhook.php</code> URL.</li>
+                        <li><strong>Schedule the heartbeat</strong> → Add a cron job that runs <code className="bg-white px-1 rounded text-xs">heartbeat.php</code> hourly.</li>
+                    </ol>
+                </div>
+
+                <h3 className="font-bold text-gray-900 text-lg">✨ What it does</h3>
+                <div className="space-y-2 text-sm text-gray-700">
+                    <CheckItem text="New Shopify orders are synced as orders (with line items), and customers are matched or created automatically." />
+                    <CheckItem text="New customers are synced to Nomdal automatically." />
+                    <CheckItem text="Shopify webhooks are verified with HMAC-SHA256 before anything is accepted." />
+                    <CheckItem text="A heartbeat keeps the platform updated on when your store last connected." />
+                </div>
+
+                <div className="bg-amber-50 border border-amber-100 rounded-xl p-4">
+                    <p className="text-sm text-amber-800">💡 <strong>Tip:</strong> Your Nomdal API key and signing secret are shown only once. If you lose them, go to <strong>Plugins → Installed Plugins</strong> and click <strong>Regenerate key</strong>.</p>
+                </div>
+            </div>
+        ),
+    },
+    {
         id: 'sales-development-rep',
         title: 'Sales Development Rep',
         icon: '🎯',

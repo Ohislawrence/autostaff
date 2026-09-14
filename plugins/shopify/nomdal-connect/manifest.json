@@ -1,0 +1,11 @@
+{
+  "plugin_id": "nomdal-connect-shopify",
+  "name": "Nomdal Connect for Shopify",
+  "version": "1.0.0",
+  "target_platform": "shopify",
+  "min_api_version": "1.0",
+  "max_api_version": "1.0",
+  "requires_shopify": "custom app (Admin API access)",
+  "short_description": "Connect your Shopify store to your Nomdal AI Employee — sync customers and orders securely via webhooks.",
+  "description": "Nomdal Connect for Shopify links your store to your Nomdal platform through a secure, scoped API key, so your AI Employee always has your customers and orders in view.\n\nFeatures:\n- Syncs new orders to Nomdal (find-or-create customer plus order line items, de-duplicated).\n- Syncs customers to Nomdal.\n- Verifies Shopify webhooks with HMAC-SHA256.\n- Reports in with a heartbeat so you can see when the store last connected.\n- Secure by default: scoped Bearer API key plus optional HMAC-SHA256 request signing to Nomdal.\n\nRequirements: a Shopify custom app with Admin API access, PHP 7.4+, and a webhook receiver URL pointing at webhook.php."
+}
