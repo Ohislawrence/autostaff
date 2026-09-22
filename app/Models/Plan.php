@@ -14,7 +14,8 @@ class Plan extends Model
         'uuid', 'name', 'slug', 'description', 'price', 'usd_price', 'currency',
         'billing_period', 'max_ai_employees', 'max_messages_per_month',
         'max_tool_calls_per_month', 'max_knowledge_sources',
-        'max_storage_bytes', 'features', 'is_active', 'sort_order',
+        'max_storage_bytes', 'max_prospecting_campaigns', 'max_daily_prospects',
+        'max_daily_outreach', 'features', 'is_active', 'sort_order',
     ];
 
     protected $casts = [
@@ -99,6 +100,33 @@ class Plan extends Model
     public function allowsCrmScoring(): bool
     {
         return in_array($this->slug, ['business', 'professional', 'enterprise']);
+    }
+
+    /**
+     * Whether this plan unlocks the outbound Prospecting engine.
+     */
+    public function allowsProspecting(): bool
+    {
+        $max = $this->max_prospecting_campaigns;
+
+        return $max === null || (int) $max > 0;
+    }
+
+    /**
+     * Per-plan prospecting limits. Null values mean "unlimited".
+     */
+    public function prospectingLimits(): array
+    {
+        return [
+            'max_campaigns' => $this->nullableInt($this->max_prospecting_campaigns),
+            'max_daily_prospects' => $this->nullableInt($this->max_daily_prospects),
+            'max_daily_outreach' => $this->nullableInt($this->max_daily_outreach),
+        ];
+    }
+
+    protected function nullableInt(mixed $value): ?int
+    {
+        return $value === null ? null : (int) $value;
     }
 
     /**

@@ -25,6 +25,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
             'check.limit' => \App\Http\Middleware\CheckSubscriptionLimits::class,
+            'prospecting.access' => \App\Http\Middleware\CheckProspectingAccess::class,
             'auth.api_key' => \App\Http\Middleware\AuthenticateApiKey::class,
             'api_key.scope' => \App\Http\Middleware\CheckApiKeyScope::class,
             'plugin.scope' => \App\Http\Middleware\CheckApiKeyScope::class,

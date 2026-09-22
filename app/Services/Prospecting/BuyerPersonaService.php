@@ -5,6 +5,8 @@ namespace App\Services\Prospecting;
 use App\Ai\Providers\AiProviderInterface;
 use App\Models\BuyerPersona;
 use App\Models\Organization;
+use App\Services\Ai\AiUsageRecorder;
+use App\Services\Guardrails\CostGuardService;
 use App\Support\AiJson;
 use Illuminate\Support\Facades\Log;
 
@@ -13,6 +15,8 @@ class BuyerPersonaService
     public function __construct(
         protected AiProviderInterface $ai,
         protected ProspectingSettingsService $settings,
+        protected AiUsageRecorder $recorder,
+        protected CostGuardService $costGuard,
     ) {}
 
     public function rules(): array
@@ -93,15 +97,22 @@ PROMPT;
         }
 
         $data = null;
-        try {
-            $response = $this->ai->chat([
-                ['role' => 'system', 'content' => 'You return strict JSON only.'],
-                ['role' => 'user', 'content' => $prompt],
-            ], $options);
+        if ($this->costGuard->checkBudget($organization->id)) {
+            try {
+                $response = $this->ai->chat([
+                    ['role' => 'system', 'content' => 'You return strict JSON only.'],
+                    ['role' => 'user', 'content' => $prompt],
+                ], $options);
 
-            $data = AiJson::parse($response->content);
-        } catch (\Throwable $e) {
-            Log::warning('Buyer persona AI generation failed', ['error' => $e->getMessage()]);
+                $this->recorder->record($organization->id, $response, [
+                    'system_prompt' => 'You return strict JSON only.',
+                    'user_prompt' => $prompt,
+                ]);
+
+                $data = AiJson::parse($response->content);
+            } catch (\Throwable $e) {
+                Log::warning('Buyer persona AI generation failed', ['error' => $e->getMessage()]);
+            }
         }
 
         if (! is_array($data) || empty($data['name'])) {

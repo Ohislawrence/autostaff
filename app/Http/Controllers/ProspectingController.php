@@ -12,6 +12,7 @@ use App\Services\Prospecting\CampaignCreator;
 use App\Services\Prospecting\OutreachService;
 use App\Services\Prospecting\ProspectQualifierService;
 use App\Services\Prospecting\ProspectingSettingsService;
+use App\Services\Prospecting\ProspectingPlanGate;
 use App\Services\Prospecting\SuppressionService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -24,7 +25,10 @@ use Inertia\Inertia;
  */
 class ProspectingController extends Controller
 {
-    public function __construct(protected ProspectingSettingsService $settings) {}
+    public function __construct(
+        protected ProspectingSettingsService $settings,
+        protected ProspectingPlanGate $gate,
+    ) {}
 
     public function index()
     {
@@ -92,6 +96,8 @@ class ProspectingController extends Controller
             ],
             'searchConfigured' => app(\App\Services\Prospecting\WebSearchService::class)->isConfigured($orgId),
             'employee' => $employee ? ['id' => $employee->id, 'name' => $employee->name] : null,
+            'planLimits' => $this->gate->limits($orgId),
+            'campaignCount' => $campaigns->count(),
         ]);
     }
 
@@ -102,7 +108,19 @@ class ProspectingController extends Controller
             return redirect()->route('onboarding.show');
         }
 
+        if (! $this->gate->isAllowed($organization)) {
+            return back()->with('error', 'Prospecting is available on the Business plan and above.');
+        }
+
+        $limits = $this->gate->limits($organization);
+
+        $count = ProspectingCampaign::where('organization_id', $organization->id)->count();
+        if ($limits['max_campaigns'] !== null && $count >= $limits['max_campaigns']) {
+            return back()->with('error', "Your plan allows up to {$limits['max_campaigns']} prospecting campaign(s).");
+        }
+
         $validated = $this->validateCampaign($request);
+        $validated['daily_limit'] = $this->clampDailyLimit($validated['daily_limit'] ?? 25, $limits['max_daily_prospects']);
 
         app(CampaignCreator::class)->create($validated, $organization);
 
@@ -113,6 +131,9 @@ class ProspectingController extends Controller
     {
         $campaign = $this->campaignOrFail($campaign);
         $validated = $this->validateCampaign($request);
+
+        $limits = $this->gate->limits($campaign->organization_id);
+        $validated['daily_limit'] = $this->clampDailyLimit($validated['daily_limit'] ?? $campaign->daily_limit, $limits['max_daily_prospects']);
 
         app(CampaignCreator::class)->update($campaign, $validated);
 
@@ -129,9 +150,26 @@ class ProspectingController extends Controller
     public function toggleCampaign(int $campaign)
     {
         $campaign = $this->campaignOrFail($campaign);
-        $campaign->update(['status' => $campaign->status === 'active' ? 'paused' : 'active']);
+        $activating = $campaign->status !== 'active';
 
-        return back()->with('success', $campaign->status === 'active' ? 'Campaign activated.' : 'Campaign paused.');
+        if ($activating) {
+            $limits = $this->gate->limits($campaign->organization_id);
+
+            if (! $this->gate->isAllowed($campaign->organization_id)) {
+                return back()->with('error', 'Prospecting is available on the Business plan and above.');
+            }
+
+            $activeCount = ProspectingCampaign::where('organization_id', $campaign->organization_id)
+                ->where('status', 'active')
+                ->count();
+            if ($limits['max_campaigns'] !== null && $activeCount >= $limits['max_campaigns']) {
+                return back()->with('error', "Your plan allows up to {$limits['max_campaigns']} active prospecting campaign(s).");
+            }
+        }
+
+        $campaign->update(['status' => $activating ? 'active' : 'paused']);
+
+        return back()->with('success', $activating ? 'Campaign activated.' : 'Campaign paused.');
     }
 
     public function runHunt(int $campaign)
@@ -386,5 +424,19 @@ class ProspectingController extends Controller
     protected function validateCampaign(Request $request): array
     {
         return $request->validate(app(CampaignCreator::class)->rules());
+    }
+
+    /**
+     * Clamp a campaign's daily hunt limit to the plan's cap (null = unlimited).
+     */
+    protected function clampDailyLimit(mixed $dailyLimit, ?int $planMax): int
+    {
+        $limit = max(1, (int) $dailyLimit);
+
+        if ($planMax !== null && $planMax > 0) {
+            $limit = min($limit, $planMax);
+        }
+
+        return $limit;
     }
 }

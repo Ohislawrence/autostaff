@@ -275,14 +275,11 @@ function formatRevenue(amount, symbol) {
     return s + num.toLocaleString(undefined, { minimumFractionDigits: 2 });
 }
 
-function MoneyCard({ label, value, sub, color, icon }) {
+function MoneyCard({ label, value, sub, color }) {
     return (
-        <div className="p-4 min-w-0">
-            <div className="flex items-center gap-1.5 text-xs font-medium text-gray-500 mb-1.5">
-                <span>{icon}</span>
-                <span className="truncate">{label}</span>
-            </div>
-            <p className={`text-xl font-bold ${color}`}>{value ?? 0}</p>
+        <div className="rounded-xl bg-gradient-to-br from-white to-gray-50 border border-gray-100 p-4">
+            <p className={`text-2xl font-bold ${color}`}>{value ?? 0}</p>
+            <p className="text-xs text-gray-600 font-medium">{label}</p>
             {sub && <p className="text-[11px] text-gray-400 mt-0.5">{sub}</p>}
         </div>
     );
@@ -290,9 +287,9 @@ function MoneyCard({ label, value, sub, color, icon }) {
 
 function ActivityStat({ label, value }) {
     return (
-        <div className="rounded-lg bg-gray-50 px-2 py-1.5 text-center min-w-0">
-            <p className="text-sm font-bold text-gray-900">{value ?? 0}</p>
-            <p className="text-[10px] text-gray-400 truncate">{label}</p>
+        <div className="text-center">
+            <p className="text-base font-bold text-gray-900">{value ?? 0}</p>
+            <p className="text-[11px] text-gray-400">{label}</p>
         </div>
     );
 }

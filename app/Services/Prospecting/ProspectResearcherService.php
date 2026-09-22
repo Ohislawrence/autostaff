@@ -4,6 +4,8 @@ namespace App\Services\Prospecting;
 
 use App\Ai\Providers\AiProviderInterface;
 use App\Models\Prospect;
+use App\Services\Ai\AiUsageRecorder;
+use App\Services\Guardrails\CostGuardService;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -20,6 +22,8 @@ class ProspectResearcherService
         protected WebSearchService $webSearch,
         protected AiProviderInterface $ai,
         protected ProspectingSettingsService $settings,
+        protected AiUsageRecorder $recorder,
+        protected CostGuardService $costGuard,
     ) {}
 
     public function research(Prospect $prospect): array
@@ -122,11 +126,20 @@ Rules:
 Return ONLY the bullets, no preamble.
 PROMPT;
 
+        if (! $this->costGuard->checkBudget($prospect->organization_id)) {
+            return $this->heuristicNotes($prospect);
+        }
+
         try {
             $response = $this->ai->chat([
                 ['role' => 'system', 'content' => 'You are a B2B research analyst. You write concise, evidence-backed reasoning.'],
                 ['role' => 'user', 'content' => $prompt],
             ], ['temperature' => 0.3, 'max_tokens' => 600]);
+
+            $this->recorder->record($prospect->organization_id, $response, [
+                'system_prompt' => 'You are a B2B research analyst. You write concise, evidence-backed reasoning.',
+                'user_prompt' => $prompt,
+            ]);
 
             $text = trim((string) $response->content);
             if ($text !== '') {

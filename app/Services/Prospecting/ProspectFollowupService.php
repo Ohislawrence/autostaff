@@ -14,7 +14,10 @@ class ProspectFollowupService
     /** Follow-up cadence in days after contact / last follow-up. */
     protected const CADENCE_DAYS = [3, 7, 14];
 
-    public function __construct(protected OutreachService $outreach) {}
+    public function __construct(
+        protected OutreachService $outreach,
+        protected ProspectingPlanGate $gate,
+    ) {}
 
     public function run(?int $campaignId = null): array
     {
@@ -34,6 +37,10 @@ class ProspectFollowupService
 
     protected function runCampaign(ProspectingCampaign $campaign): int
     {
+        if (! $this->gate->isAllowed($campaign->organization_id)) {
+            return 0;
+        }
+
         $sent = 0;
 
         $prospects = $campaign->prospects()

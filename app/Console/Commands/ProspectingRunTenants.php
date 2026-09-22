@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Jobs\Prospecting\RunHuntJob;
 use App\Jobs\Prospecting\RunOutreachJob;
 use App\Models\ProspectingCampaign;
+use App\Models\ProspectingSettings;
 use Illuminate\Console\Command;
 
 class ProspectingRunTenants extends Command
@@ -14,11 +15,26 @@ class ProspectingRunTenants extends Command
 
     public function handle(): int
     {
+        $settings = ProspectingSettings::instance();
+
+        if (! $settings->auto_hunt) {
+            $this->info('Auto-hunt is disabled.');
+
+            return self::SUCCESS;
+        }
+
         $query = ProspectingCampaign::whereNotNull('organization_id')->where('status', 'active');
 
         if ($org = $this->option('organization')) {
             $query->where('organization_id', $org);
         }
+
+        // Only run campaigns that have not already been hunted today, so an
+        // active tenant cannot trigger AI hunts every hour.
+        $query->where(function ($q) {
+            $q->whereNull('last_run_at')
+              ->orWhereDate('last_run_at', '!=', now()->toDateString());
+        });
 
         $campaigns = $query->get();
 

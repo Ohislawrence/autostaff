@@ -22,6 +22,9 @@ class PlansTableSeeder extends Seeder
                 'max_messages_per_month' => 100,
                 'max_tool_calls_per_month' => 50,
                 'max_knowledge_sources' => 20,
+                'max_prospecting_campaigns' => 0,
+                'max_daily_prospects' => 0,
+                'max_daily_outreach' => 0,
                 'features' => [
                     '1 AI Employee',
                     '100 messages/month',
@@ -48,6 +51,9 @@ class PlansTableSeeder extends Seeder
                 'max_messages_per_month' => 500,
                 'max_tool_calls_per_month' => 100,
                 'max_knowledge_sources' => 50,
+                'max_prospecting_campaigns' => 0,
+                'max_daily_prospects' => 0,
+                'max_daily_outreach' => 0,
                 'features' => [
                     '1 AI Employee',
                     'Web Chat only',
@@ -76,6 +82,9 @@ class PlansTableSeeder extends Seeder
                 'max_messages_per_month' => 3000,
                 'max_tool_calls_per_month' => 1000,
                 'max_knowledge_sources' => 150,
+                'max_prospecting_campaigns' => 2,
+                'max_daily_prospects' => 25,
+                'max_daily_outreach' => 50,
                 'features' => [
                     '3 AI Employees',
                     'All Channels (Web, Email, WhatsApp)',
@@ -106,6 +115,9 @@ class PlansTableSeeder extends Seeder
                 'max_messages_per_month' => 10000,
                 'max_tool_calls_per_month' => 5000,
                 'max_knowledge_sources' => 500,
+                'max_prospecting_campaigns' => 5,
+                'max_daily_prospects' => 100,
+                'max_daily_outreach' => 200,
                 'features' => [
                     '10 AI Employees',
                     'All Channels + Webhooks',
@@ -136,6 +148,9 @@ class PlansTableSeeder extends Seeder
                 'max_messages_per_month' => 1000000,
                 'max_tool_calls_per_month' => 500000,
                 'max_knowledge_sources' => 1000,
+                'max_prospecting_campaigns' => null,
+                'max_daily_prospects' => null,
+                'max_daily_outreach' => null,
                 'features' => [
                     'Unlimited AI Employees',
                     'Unlimited messages & tool calls',

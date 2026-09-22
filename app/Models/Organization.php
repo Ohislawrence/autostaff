@@ -84,6 +84,23 @@ class Organization extends Model
         return $this->hasMany(Subscription::class);
     }
 
+    /**
+     * Resolve the organization's currently-active plan, falling back to Free.
+     */
+    public function activePlan(): ?Plan
+    {
+        $subscription = $this->subscriptions()
+            ->where('status', 'active')
+            ->latest()
+            ->first();
+
+        if ($subscription && $subscription->plan) {
+            return $subscription->plan;
+        }
+
+        return Plan::where('slug', 'free')->where('is_active', true)->first();
+    }
+
     public function knowledgeBases()
     {
         return $this->hasMany(KnowledgeBase::class);

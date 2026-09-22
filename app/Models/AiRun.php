@@ -12,7 +12,7 @@ class AiRun extends Model
     use HasFactory, TenantAware;
 
     protected $fillable = [
-        'uuid', 'ai_employee_id', 'conversation_id', 'message_id',
+        'uuid', 'organization_id', 'ai_employee_id', 'conversation_id', 'message_id',
         'provider', 'model', 'input_tokens', 'output_tokens', 'latency_ms',
         'tools_called', 'knowledge_retrieved', 'system_prompt', 'user_prompt',
         'assistant_response', 'estimated_cost', 'status', 'error_message',

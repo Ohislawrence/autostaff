@@ -17,6 +17,7 @@ use App\Automation\TriggerRegistry;
 use App\Services\ConversationService;
 use App\Services\Guardrails\CostGuardService;
 use App\Services\Guardrails\FallbackManager;
+use App\Services\Billing\AiCostEstimator;
 use App\Services\Mcp\McpConnectionManager;
 use App\Services\Mcp\McpToolRegistrar;
 use App\Services\Automation\AutomationService;
@@ -196,6 +197,7 @@ class AppServiceProvider extends ServiceProvider
                 $app->make(AiContextBuilder::class),
                 $app->make(ConversationService::class),
                 $app->make(ToolExecutor::class),
+                $app->make(AiCostEstimator::class),
                 $app->make(IntentService::class),
                 $app->make(KnowledgeGapService::class),
                 $app->make(CostGuardService::class),

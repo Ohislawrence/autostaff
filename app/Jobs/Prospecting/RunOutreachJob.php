@@ -5,6 +5,7 @@ namespace App\Jobs\Prospecting;
 use App\Models\ProspectingCampaign;
 use App\Models\ProspectingSettings;
 use App\Services\Prospecting\OutreachService;
+use App\Services\Prospecting\ProspectingPlanGate;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -21,7 +22,7 @@ class RunOutreachJob implements ShouldQueue
 
     public function __construct(protected int $campaignId) {}
 
-    public function handle(OutreachService $outreach): void
+    public function handle(OutreachService $outreach, ProspectingPlanGate $gate): void
     {
         $campaign = ProspectingCampaign::withTrashed()->find($this->campaignId);
 
@@ -29,7 +30,20 @@ class RunOutreachJob implements ShouldQueue
             return;
         }
 
+        if (! $gate->isAllowed($campaign->organization_id)) {
+            return;
+        }
+
         $limit = max(1, (int) (ProspectingSettings::instance()->daily_outreach_limit ?: 50));
+
+        $planMax = $gate->maxDailyOutreach($campaign->organization_id);
+        if ($planMax !== null) {
+            $limit = min($limit, $planMax);
+        }
+
+        if ($limit < 1) {
+            return;
+        }
 
         $prospects = $campaign->prospects()
             ->where('status', 'qualified')

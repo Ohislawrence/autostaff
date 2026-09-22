@@ -5,6 +5,8 @@ namespace App\Services\Prospecting;
 use App\Ai\Providers\AiProviderInterface;
 use App\Models\ProspectingCampaign;
 use App\Models\Prospect;
+use App\Services\Ai\AiUsageRecorder;
+use App\Services\Guardrails\CostGuardService;
 use App\Support\AiJson;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -17,6 +19,9 @@ class ProspectHunterService
         protected AiProviderInterface $ai,
         protected ProspectingSettingsService $settings,
         protected ContactValidator $validator,
+        protected AiUsageRecorder $recorder,
+        protected CostGuardService $costGuard,
+        protected ProspectingPlanGate $gate,
     ) {}
 
     /**
@@ -25,6 +30,17 @@ class ProspectHunterService
     public function hunt(ProspectingCampaign $campaign): array
     {
         $limit = max(1, (int) ($campaign->daily_limit ?: 25));
+
+        // Cap by the tenant's plan prospecting allowance (0 = not available).
+        $planMax = $this->gate->maxDailyProspects($campaign->organization_id);
+        if ($planMax !== null) {
+            $limit = min($limit, $planMax);
+        }
+
+        if ($limit < 1) {
+            return ['created' => 0, 'sources' => ['web_search' => 0, 'ai_generated' => 0]];
+        }
+
         $created = 0;
         $sources = ['web_search' => 0, 'ai_generated' => 0];
 
@@ -45,23 +61,27 @@ class ProspectHunterService
             }
         }
 
-        // 2. DeepSeek-assisted generation (always available — uses the wired API).
-        try {
-            $aiProspects = $this->generateWithAi($campaign, max(1, $limit - $created));
-            foreach ($aiProspects as $data) {
-                if ($created >= $limit) {
-                    break;
+        // 2. DeepSeek-assisted generation — only when we still need prospects.
+        // Skip the AI call entirely if web search already filled the daily quota,
+        // so we never burn tokens when there is no remaining work to do.
+        if ($created < $limit) {
+            try {
+                $aiProspects = $this->generateWithAi($campaign, $limit - $created);
+                foreach ($aiProspects as $data) {
+                    if ($created >= $limit) {
+                        break;
+                    }
+                    if ($this->upsert($campaign, $data, 'ai_generated')) {
+                        $created++;
+                        $sources['ai_generated']++;
+                    }
                 }
-                if ($this->upsert($campaign, $data, 'ai_generated')) {
-                    $created++;
-                    $sources['ai_generated']++;
-                }
+            } catch (\Throwable $e) {
+                Log::warning('Prospecting AI generation failed', [
+                    'campaign_id' => $campaign->id,
+                    'error' => $e->getMessage(),
+                ]);
             }
-        } catch (\Throwable $e) {
-            Log::warning('Prospecting AI generation failed', [
-                'campaign_id' => $campaign->id,
-                'error' => $e->getMessage(),
-            ]);
         }
 
         $campaign->update([
@@ -220,10 +240,19 @@ PROMPT;
             $options['model'] = $model;
         }
 
+        if (! $this->costGuard->checkBudget($campaign->organization_id)) {
+            return [];
+        }
+
         $response = $this->ai->chat([
             ['role' => 'system', 'content' => 'You return strict JSON only.'],
             ['role' => 'user', 'content' => $prompt],
         ], $options);
+
+        $this->recorder->record($campaign->organization_id, $response, [
+            'system_prompt' => 'You return strict JSON only.',
+            'user_prompt' => $prompt,
+        ]);
 
         $data = AiJson::parse($response->content);
 

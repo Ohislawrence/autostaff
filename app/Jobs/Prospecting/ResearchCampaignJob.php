@@ -4,6 +4,7 @@ namespace App\Jobs\Prospecting;
 
 use App\Models\ProspectingCampaign;
 use App\Services\Prospecting\ProspectResearcherService;
+use App\Services\Prospecting\ProspectingPlanGate;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -20,11 +21,15 @@ class ResearchCampaignJob implements ShouldQueue
 
     public function __construct(protected int $campaignId) {}
 
-    public function handle(ProspectResearcherService $researcher): void
+    public function handle(ProspectResearcherService $researcher, ProspectingPlanGate $gate): void
     {
         $campaign = ProspectingCampaign::withTrashed()->find($this->campaignId);
 
         if (! $campaign) {
+            return;
+        }
+
+        if (! $gate->isAllowed($campaign->organization_id)) {
             return;
         }
 

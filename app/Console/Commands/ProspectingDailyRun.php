@@ -32,6 +32,12 @@ class ProspectingDailyRun extends Command
         }
 
         foreach ($campaigns as $campaign) {
+            // Skip campaigns already hunted today (e.g. by the hourly tenant runner).
+            if ($campaign->last_run_at && $campaign->last_run_at->isToday()) {
+                $this->line("Skipping <info>{$campaign->name}</info> — already ran today.");
+                continue;
+            }
+
             if ($campaign->auto_outreach) {
                 RunHuntJob::withChain([new RunOutreachJob($campaign->id)])->dispatch($campaign->id);
             } else {

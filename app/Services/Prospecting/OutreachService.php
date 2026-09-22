@@ -3,7 +3,10 @@
 namespace App\Services\Prospecting;
 
 use App\Ai\Providers\AiProviderInterface;
+use App\Ai\Providers\AiResponse;
 use App\Models\Prospect;
+use App\Services\Ai\AiUsageRecorder;
+use App\Services\Guardrails\CostGuardService;
 use App\Support\AiJson;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -16,6 +19,8 @@ class OutreachService
         protected ProspectingSettingsService $settings,
         protected ComplianceGate $gate,
         protected ContactValidator $validator,
+        protected AiUsageRecorder $recorder,
+        protected CostGuardService $costGuard,
     ) {}
 
     /**
@@ -255,11 +260,20 @@ PROMPT;
             $options['model'] = $model;
         }
 
+        if (! $this->costGuard->checkBudget($prospect->organization_id)) {
+            return [
+                'subject' => 'Re: ' . ($prospect->email_subject ?: 'Quick question'),
+                'body' => $this->fallbackBody($prospect, $campaign),
+            ];
+        }
+
         try {
             $response = $this->ai->chat([
                 ['role' => 'system', 'content' => 'You are a B2B sales rep writing brief, polite follow-up emails.'],
                 ['role' => 'user', 'content' => $user],
             ], $options);
+
+            $this->recordRun($prospect, $response, 'You are a B2B sales rep writing brief, polite follow-up emails.', $user);
 
             $data = AiJson::parse($response->content);
         } catch (\Throwable $e) {
@@ -287,6 +301,14 @@ PROMPT;
         ]);
 
         return ['subject' => $subject, 'body' => $body];
+    }
+
+    protected function recordRun(Prospect $prospect, AiResponse $response, string $system, string $user): void
+    {
+        $this->recorder->record($prospect->organization_id, $response, [
+            'system_prompt' => $system,
+            'user_prompt' => $user,
+        ]);
     }
 
     protected function markCompliance(Prospect $prospect, array $gate): void
@@ -365,10 +387,19 @@ PROMPT;
             $options['model'] = $model;
         }
 
+        if (! $this->costGuard->checkBudget($prospect->organization_id)) {
+            return [
+                'subject' => 'Quick question for ' . ($prospect->company ?: $prospect->name ?: 'you'),
+                'body' => $this->fallbackBody($prospect, $campaign),
+            ];
+        }
+
         $response = $this->ai->chat([
             ['role' => 'system', 'content' => $system],
             ['role' => 'user', 'content' => $user],
         ], $options);
+
+        $this->recordRun($prospect, $response, $system, $user);
 
         $data = AiJson::parse($response->content);
 

@@ -316,7 +316,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         });
 
         // Prospecting (outbound AI Sales Employee — tenant-scoped)
-        Route::middleware('can:prospecting.view')->group(function () {
+        Route::middleware(['can:prospecting.view', 'prospecting.access'])->group(function () {
             Route::get('/prospecting', [\App\Http\Controllers\ProspectingController::class, 'index'])->name('prospecting.index');
             Route::get('/prospecting/campaigns', [\App\Http\Controllers\ProspectingController::class, 'campaigns'])->name('prospecting.campaigns');
             Route::get('/prospecting/prospects', [\App\Http\Controllers\ProspectingController::class, 'prospects'])->name('prospecting.prospects');

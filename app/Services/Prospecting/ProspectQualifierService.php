@@ -5,6 +5,8 @@ namespace App\Services\Prospecting;
 use App\Ai\Providers\AiProviderInterface;
 use App\Models\ProspectingSettings;
 use App\Models\Prospect;
+use App\Services\Ai\AiUsageRecorder;
+use App\Services\Guardrails\CostGuardService;
 use App\Support\AiJson;
 use Illuminate\Support\Facades\Log;
 
@@ -13,6 +15,8 @@ class ProspectQualifierService
     public function __construct(
         protected AiProviderInterface $ai,
         protected ProspectingSettingsService $settings,
+        protected AiUsageRecorder $recorder,
+        protected CostGuardService $costGuard,
     ) {}
 
     /**
@@ -89,10 +93,19 @@ PROMPT;
             $options['model'] = $model;
         }
 
+        if (! $this->costGuard->checkBudget($prospect->organization_id)) {
+            return null;
+        }
+
         $response = $this->ai->chat([
             ['role' => 'system', 'content' => 'You return strict JSON only.'],
             ['role' => 'user', 'content' => $prompt],
         ], $options);
+
+        $this->recorder->record($prospect->organization_id, $response, [
+            'system_prompt' => 'You return strict JSON only.',
+            'user_prompt' => $prompt,
+        ]);
 
         $data = AiJson::parse($response->content);
 

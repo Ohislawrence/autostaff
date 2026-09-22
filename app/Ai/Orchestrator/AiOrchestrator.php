@@ -12,6 +12,7 @@ use App\Models\Conversation;
 use App\Models\Customer;
 use App\Models\Message;
 use App\Ai\Tools\ToolExecutor;
+use App\Services\Billing\AiCostEstimator;
 use App\Services\ConversationService;
 use App\Services\Guardrails\CostGuardService;
 use App\Services\Guardrails\FallbackManager;
@@ -30,6 +31,7 @@ class AiOrchestrator
         protected AiContextBuilder $contextBuilder,
         protected ConversationService $conversationService,
         protected ToolExecutor $toolExecutor,
+        protected AiCostEstimator $costEstimator,
         protected ?IntentService $intentService = null,
         protected ?KnowledgeGapService $knowledgeGapService = null,
         protected ?CostGuardService $costGuard = null,
@@ -557,14 +559,6 @@ class AiOrchestrator
      */
     protected function estimateCost(AiResponse $response): float
     {
-        // DeepSeek pricing per 1M tokens (approximate, as of 2026):
-        // deepseek-chat: $0.14 input, $0.28 output
-        $inputCostPerM = 0.14;
-        $outputCostPerM = 0.28;
-
-        $inputCost = ($response->inputTokens / 1000000) * $inputCostPerM;
-        $outputCost = ($response->outputTokens / 1000000) * $outputCostPerM;
-
-        return round($inputCost + $outputCost, 6);
+        return $this->costEstimator->estimate($response);
     }
 }

@@ -5,6 +5,7 @@ namespace App\Jobs\Prospecting;
 use App\Models\ProspectingCampaign;
 use App\Services\Prospecting\ProspectHunterService;
 use App\Services\Prospecting\ProspectQualifierService;
+use App\Services\Prospecting\ProspectingPlanGate;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -21,11 +22,15 @@ class RunHuntJob implements ShouldQueue
 
     public function __construct(protected int $campaignId) {}
 
-    public function handle(ProspectHunterService $hunter, ProspectQualifierService $qualifier): void
+    public function handle(ProspectHunterService $hunter, ProspectQualifierService $qualifier, ProspectingPlanGate $gate): void
     {
         $campaign = ProspectingCampaign::withTrashed()->find($this->campaignId);
 
         if (! $campaign) {
+            return;
+        }
+
+        if (! $gate->isAllowed($campaign->organization_id)) {
             return;
         }
 
