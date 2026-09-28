@@ -366,16 +366,18 @@ class AiOrchestrator
         // LEARN — record the escalation as a knowledge gap.
         $this->recordGap($employee->organization_id, $messageContent, 'escalation');
 
-        $summary = "Customer message: {$messageContent}. Escalation triggered automatically based on escalation rules.";
-        $this->conversationService->escalateToHuman($conversation, 'Automatic escalation trigger', $summary);
-
-        // Send a response indicating handoff
+        // Send a response indicating handoff.
         $escalationMessage = "I'm going to transfer you to a member of our team who can better assist you. Please hold on while I connect you with a human agent.";
 
         $this->conversationService->createAiResponse($conversation, $employee, $escalationMessage, [
             'escalation' => true,
             'correlation_id' => $correlationId,
         ]);
+
+        // Escalate LAST so the conversation ends in `human_required`
+        // (createAiResponse would otherwise reset it back to `ai_handling`).
+        $summary = "Customer message: {$messageContent}. Escalation triggered automatically based on escalation rules.";
+        $this->conversationService->escalateToHuman($conversation, 'Automatic escalation trigger', $summary);
 
         return [
             'success' => true,

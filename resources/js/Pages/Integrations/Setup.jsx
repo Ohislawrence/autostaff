@@ -6,6 +6,7 @@ export default function Setup({ channel, integration }) {
     const { errors, flash } = usePage().props;
     const [submitting, setSubmitting] = useState(false);
     const [syncing, setSyncing] = useState(false);
+    const [testing, setTesting] = useState(false);
     const [form, setForm] = useState(() => {
         const initial = {};
         if (channel?.schema?.properties) {
@@ -40,6 +41,13 @@ export default function Setup({ channel, integration }) {
         setSyncing(true);
         router.post(`/integrations/${channel.key}/sync`, {}, {
             onFinish: () => setSyncing(false),
+        });
+    };
+
+    const handleTest = () => {
+        setTesting(true);
+        router.post(`/integrations/${channel.key}/test`, form, {
+            onFinish: () => setTesting(false),
         });
     };
 
@@ -105,6 +113,9 @@ export default function Setup({ channel, integration }) {
                                     <label htmlFor={fieldId} className="block text-sm font-medium text-gray-700 mb-1 capitalize">
                                         {key.replace(/_/g, ' ')}
                                         {isRequired && <span className="text-red-500 ml-1">*</span>}
+                                        {integration?.saved_keys?.includes(key) && (
+                                            <span className="ml-2 text-xs text-green-600 font-medium">✓ saved</span>
+                                        )}
                                     </label>
 
                                     {prop.enum ? (
@@ -169,6 +180,17 @@ export default function Setup({ channel, integration }) {
                     </div>
 
                     <div className="flex items-center gap-3 mt-6 pt-6 border-t border-gray-100">
+                        {channel.key === 'woocommerce' && (
+                            <button
+                                type="button"
+                                onClick={handleTest}
+                                disabled={testing}
+                                className="px-5 py-2.5 bg-gray-100 text-gray-700 rounded-lg text-sm font-semibold hover:bg-gray-200 disabled:opacity-50 transition-colors"
+                            >
+                                {testing ? 'Testing…' : 'Test Connection'}
+                            </button>
+                        )}
+
                         <button
                             type="submit"
                             disabled={submitting}
@@ -221,6 +243,20 @@ export default function Setup({ channel, integration }) {
                                 Test mode is available immediately with limited phone numbers.
                             </p>
                         </div>
+                    </div>
+                )}
+
+                {channel.key === 'woocommerce' && (
+                    <div className="mt-6 bg-purple-50 rounded-xl border border-purple-100 p-5">
+                        <h4 className="text-sm font-semibold text-purple-800 mb-2">🛒 WooCommerce Integration Guide</h4>
+                        <ol className="text-sm text-purple-700 space-y-2 list-decimal list-inside">
+                            <li>In WooCommerce, go to <strong>Settings → Advanced → REST API</strong> and create a key with <strong>Read</strong> access — paste the Consumer Key and Consumer Secret above.</li>
+                            <li>In WooCommerce, go to <strong>Settings → Advanced → Webhooks → Add webhook</strong>.</li>
+                            <li>Set the <strong>Delivery URL</strong> to: <code className="bg-purple-100 px-1 rounded text-xs">{window.location.origin}/api/v1/webhooks/woocommerce</code></li>
+                            <li>Set <strong>Topic</strong> to <code className="bg-purple-100 px-1 rounded text-xs">Product updated</code> (also add <code className="bg-purple-100 px-1 rounded text-xs">Product created</code> and <code className="bg-purple-100 px-1 rounded text-xs">Order updated</code> to keep orders in sync).</li>
+                            <li>If you entered a Webhook Secret above, paste the same value into the webhook's <strong>Secret</strong> field.</li>
+                            <li>Save the configuration above, then click <strong>Sync Products</strong> to import your catalogue.</li>
+                        </ol>
                     </div>
                 )}
             </div>

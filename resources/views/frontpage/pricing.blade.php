@@ -22,11 +22,11 @@
 
         <div class="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             @php $plans = [
-                ['Free', '₦0', '$0', '₦0', '$0', 'Try Nomdal free — no credit card required.', ['1 AI Employee', '100 messages / month', 'Web Chat only', '1 Knowledge Base (20 sources)', 'Basic lead tracking', 'Community support'], false, 'bg-white/40'],
-                ['Starter', '₦45,000', '$29', '₦37,500', '$24', 'For solo entrepreneurs testing AI.', ['1 AI Employee', 'Web Chat only', '500 messages / month', '1 Knowledge Base (50 sources)', 'Basic CRM (lead tracking)', '5 automations', '5 team members'], false, 'bg-white/40'],
-                ['Business', '₦150,000', '$99', '₦125,000', '$82', 'For growing businesses with multi-channel needs.', ['3 AI Employees', 'All Channels (Web, Email, WhatsApp)', '3,000 messages / month', 'Full CRM (scoring & pipeline)', 'Appointments & Commerce', '20 automations', '15 team members'], true, 'bg-ink'],
-                ['Professional', '₦375,000', '$249', '₦312,500', '$208', 'For established businesses and agencies.', ['10 AI Employees', 'All Channels + Webhooks', '10,000 messages / month', 'Custom Tools + REST API', '50 automations', '50 team members', '99.5% SLA'], false, 'bg-white/40'],
-                ['Enterprise', 'Custom', '', 'Custom', '', 'For large organizations. Contact sales.', ['Unlimited AI Employees', 'Unlimited messages & tools', 'White-label (add-on)', 'Custom integrations', 'Dedicated infrastructure', '500+ team members', '99.9% SLA'], false, 'bg-purple/60'],
+                ['Free', '₦0', '$0', '₦0', '$0', 'Try Nomdal free — no credit card required.', ['1 AI Employee', '100 messages / month', 'Web Chat only', '1 Knowledge Base (20 sources)', 'Basic lead tracking', 'Community support', 'Prospecting not included'], false, 'bg-white/40'],
+                ['Starter', '₦45,000', '$29', '₦37,500', '$24', 'For solo entrepreneurs testing AI.', ['1 AI Employee', 'Web Chat only', '500 messages / month', '1 Knowledge Base (50 sources)', 'Basic CRM (lead tracking)', '5 automations', '5 team members', 'Prospecting not included'], false, 'bg-white/40'],
+                ['Business', '₦150,000', '$99', '₦125,000', '$82', 'For growing businesses with multi-channel needs.', ['3 AI Employees', 'All Channels (Web, Email, WhatsApp)', '3,000 messages / month', 'Full CRM (scoring & pipeline)', 'Appointments & Commerce', '20 automations', '15 team members', 'Prospecting: 2 campaigns · 25/day prospects · 50/day outreach'], true, 'bg-ink'],
+                ['Professional', '₦375,000', '$249', '₦312,500', '$208', 'For established businesses and agencies.', ['10 AI Employees', 'All Channels + Webhooks', '10,000 messages / month', 'Custom Tools + REST API', '50 automations', '50 team members', '99.5% SLA', 'Prospecting: 5 campaigns · 100/day prospects · 200/day outreach'], false, 'bg-white/40'],
+                ['Enterprise', 'Custom', '', 'Custom', '', 'For large organizations. Contact sales.', ['Unlimited AI Employees', 'Unlimited messages & tools', 'White-label (add-on)', 'Custom integrations', 'Dedicated infrastructure', '500+ team members', '99.9% SLA', 'Unlimited prospecting'], false, 'bg-purple/60'],
             ]; @endphp
 
             @foreach ($plans as [$name, $price, $usd, $annual, $annualUsd, $tagline, $features, $featured, $bg])
@@ -94,6 +94,7 @@
                             ['Appointments', '—', '✓', '✓', '✓'],
                             ['Commerce (Shopify/Woo)', '—', '✓', '✓', '✓'],
                             ['Automations', '5', '20', '50', 'Unlimited'],
+                            ['Prospecting', '—', '2 campaigns, 25/day', '5 campaigns, 100/day', 'Unlimited'],
                             ['Team members', '5', '15', '50', '500+'],
                             ['REST API', '—', '—', '✓', '✓'],
                             ['White-label', '—', '—', '—', 'Add-on'],

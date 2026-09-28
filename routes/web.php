@@ -6,7 +6,15 @@ use App\Http\Controllers\SettingsController;
 use Illuminate\Support\Facades\Route;
 
 // Public frontpage (marketing site)
-Route::view('/', 'frontpage.home')->name('frontpage.home');
+Route::get('/', function () {
+    return view('frontpage.home', [
+        'latestPosts' => \App\Models\Post::with('author:id,name')
+            ->published()
+            ->orderByDesc('published_at')
+            ->limit(3)
+            ->get(),
+    ]);
+})->name('frontpage.home');
 Route::view('/product', 'frontpage.product')->name('frontpage.product');
 Route::view('/templates', 'frontpage.templates')->name('frontpage.templates');
 Route::view('/pricing', 'frontpage.pricing')->name('frontpage.pricing');
@@ -17,6 +25,19 @@ Route::view('/services', 'frontpage.services')->name('frontpage.services');
 Route::view('/contact', 'frontpage.contact')->name('frontpage.contact');
 Route::view('/privacy', 'frontpage.privacy')->name('frontpage.privacy');
 Route::view('/terms', 'frontpage.terms')->name('frontpage.terms');
+
+// Public blog (marketing articles)
+Route::get('/blog', [\App\Http\Controllers\BlogController::class, 'publicIndex'])->name('blog.index');
+Route::get('/blog/{slug}', [\App\Http\Controllers\BlogController::class, 'show'])->name('blog.show');
+
+// Public chat widget endpoint — the AI Employee is resolved by UUID and the
+// controller resolves the owning tenant/org from the employee (no auth required).
+Route::post('/chat/{aiEmployee:uuid}/message', [\App\Http\Controllers\ChatController::class, 'sendMessage'])
+    ->name('chat.send-message');
+
+// Poll for new human messages in a conversation (widget polling after handoff).
+Route::get('/chat/{aiEmployee:uuid}/conversation/{conversationUuid}/poll', [\App\Http\Controllers\ChatController::class, 'pollConversation'])
+    ->name('chat.poll');
 
 // Public plugin marketplace (browse-only)
 Route::get('/marketplace', function () {
@@ -57,6 +78,7 @@ Route::get('/sitemap.xml', function () {
         ['/services', '0.7', 'monthly'],
         ['/contact', '0.7', 'monthly'],
         ['/marketplace', '0.8', 'weekly'],
+        ['/blog', '0.8', 'weekly'],
         ['/privacy', '0.1', 'yearly'],
         ['/terms', '0.1', 'yearly'],
     ];
@@ -71,6 +93,16 @@ Route::get('/sitemap.xml', function () {
             . '    <lastmod>' . now()->toDateString() . '</lastmod>' . "\n"
             . '    <changefreq>' . $changefreq . '</changefreq>' . "\n"
             . '    <priority>' . $priority . '</priority>' . "\n"
+            . '  </url>' . "\n";
+    }
+
+    // Include published blog posts
+    foreach (\App\Models\Post::published()->orderByDesc('published_at')->get() as $post) {
+        $xml .= '  <url>' . "\n"
+            . '    <loc>' . e($base . '/blog/' . $post->slug) . '</loc>' . "\n"
+            . '    <lastmod>' . ($post->updated_at?->toDateString() ?? now()->toDateString()) . '</lastmod>' . "\n"
+            . '    <changefreq>monthly</changefreq>' . "\n"
+            . '    <priority>0.7</priority>' . "\n"
             . '  </url>' . "\n";
     }
     $xml .= '</urlset>';
@@ -200,6 +232,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/platform/plugin-versions/{version}/deprecate', [\App\Http\Controllers\Platform\PluginController::class, 'deprecateVersion'])->name('platform.plugin-versions.deprecate');
         Route::delete('/platform/plugin-versions/{version}', [\App\Http\Controllers\Platform\PluginController::class, 'destroyVersion'])->name('platform.plugin-versions.destroy');
 
+        // Blog (marketing posts + SEO/OG meta)
+        Route::get('/platform/blog', [\App\Http\Controllers\BlogController::class, 'index'])->name('platform.blog.index');
+        Route::get('/platform/blog/create', [\App\Http\Controllers\BlogController::class, 'create'])->name('platform.blog.create');
+        Route::post('/platform/blog', [\App\Http\Controllers\BlogController::class, 'store'])->name('platform.blog.store');
+        Route::get('/platform/blog/{post}/edit', [\App\Http\Controllers\BlogController::class, 'edit'])->name('platform.blog.edit');
+        Route::put('/platform/blog/{post}', [\App\Http\Controllers\BlogController::class, 'update'])->name('platform.blog.update');
+        Route::delete('/platform/blog/{post}', [\App\Http\Controllers\BlogController::class, 'destroy'])->name('platform.blog.destroy');
+
         // Operator Command Center (marketing, tasks, achievements, goals)
         Route::get('/platform/marketing', [\App\Http\Controllers\Platform\GrowthController::class, 'marketing'])->name('platform.marketing');
         Route::post('/platform/marketing/channels', [\App\Http\Controllers\Platform\GrowthController::class, 'storeChannel'])->name('platform.marketing.channels.store');
@@ -272,10 +312,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::middleware('can:ai-employees.test')->group(function () {
             Route::post('/ai-employees/{aiEmployee}/test', [AiEmployeeController::class, 'test'])->name('ai-employees.test');
         });
-
-        // Chat widget endpoint (public-facing — no permission required, uses employee UUID)
-        Route::post('/chat/{aiEmployee:uuid}/message', [App\Http\Controllers\ChatController::class, 'sendMessage'])
-            ->name('chat.send-message');
 
         // Knowledge Base
         Route::middleware('can:knowledge.view')->group(function () {
@@ -420,6 +456,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Reports (scheduled business performance reports)
         Route::middleware('can:analytics.view')->group(function () {
             Route::get('/reports', [\App\Http\Controllers\ReportController::class, 'index'])->name('reports.index');
+            Route::post('/reports/alerts', [\App\Http\Controllers\ReportController::class, 'saveAlerts'])->name('reports.alerts');
         });
 
         // Billing
@@ -455,12 +492,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/integrations/{channel}', [\App\Http\Controllers\IntegrationController::class, 'setup'])->name('integrations.setup');
             Route::post('/integrations/{channel}/save', [\App\Http\Controllers\IntegrationController::class, 'saveConfig'])->name('integrations.save');
             Route::post('/integrations/{channel}/sync', [\App\Http\Controllers\IntegrationController::class, 'sync'])->name('integrations.sync');
+            Route::post('/integrations/{channel}/test', [\App\Http\Controllers\IntegrationController::class, 'test'])->name('integrations.test');
             Route::delete('/integrations/{channel}/disconnect', [\App\Http\Controllers\IntegrationController::class, 'disconnect'])->name('integrations.disconnect');
         });
 
         // Channels (per-AI-employee config)
         Route::get('/ai-employees/{aiEmployee}/channels', [\App\Http\Controllers\Channel\ChannelSetupController::class, 'setup'])->name('channels.setup');
         Route::post('/ai-employees/{aiEmployee}/channels/toggle', [\App\Http\Controllers\Channel\ChannelSetupController::class, 'toggleChannel'])->name('channels.toggle');
+        Route::post('/ai-employees/{aiEmployee}/channels/widget', [\App\Http\Controllers\Channel\ChannelSetupController::class, 'saveWidgetSettings'])->name('channels.widget');
 
         // Inbox (Conversation Hub)
         Route::middleware('can:conversations.view')->group(function () {

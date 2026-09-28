@@ -56,6 +56,7 @@ class WooCommerceAdapter implements ChannelInterface
                 ],
                 'webhook_secret' => [
                     'type' => 'string',
+                    'nullable' => true,
                     'description' => 'Secret used to verify incoming WooCommerce webhooks',
                 ],
             ],

@@ -9,4 +9,12 @@ use Illuminate\Database\Eloquent\Model;
 class IntegrationCredential extends Model
 {
     use HasFactory, TenantAware;
+
+    protected $fillable = [
+        'organization_id',
+        'integration_id',
+        'key',
+        'value',
+        'type',
+    ];
 }

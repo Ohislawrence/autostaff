@@ -6,6 +6,7 @@ use App\Channels\ChannelManager;
 use App\Models\Integration;
 use App\Services\Commerce\ProductSyncService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Inertia\Inertia;
 
 class IntegrationController extends Controller
@@ -26,8 +27,10 @@ class IntegrationController extends Controller
             ->first();
 
         $config = $integration?->config ?? [];
+        $savedKeys = [];
         foreach (Integration::SENSITIVE_CONFIG_KEYS as $key) {
-            if (array_key_exists($key, $config)) {
+            if (! empty($config[$key] ?? null)) {
+                $savedKeys[] = $key;
                 $config[$key] = '';
             }
         }
@@ -43,6 +46,7 @@ class IntegrationController extends Controller
                 'id' => $integration->id,
                 'is_connected' => $isConnected,
                 'config' => $config,
+                'saved_keys' => $savedKeys,
                 'status' => $integration->status,
                 'last_synced_at' => $integration->last_synced_at?->toIso8601String(),
             ] : null,
@@ -149,13 +153,55 @@ class IntegrationController extends Controller
     public function sync(string $channel)
     {
         $organization = current_org();
-        $result = app(ProductSyncService::class)->sync($organization);
+
+        try {
+            $result = app(ProductSyncService::class)->sync($organization);
+        } catch (\Throwable $e) {
+            return back()->with('error', 'Store sync failed: '.$e->getMessage());
+        }
 
         if (empty($result['success'])) {
             return back()->with('error', 'Store sync failed: '.($result['error'] ?? 'Unknown error'));
         }
 
         return back()->with('success', "Products synced: {$result['imported']} imported, {$result['updated']} updated.");
+    }
+
+    /**
+     * Test connectivity/credentials for an integration without saving first.
+     */
+    public function test(Request $request, string $channel)
+    {
+        if ($channel === 'woocommerce') {
+            $storeUrl = rtrim((string) $request->input('store_url', ''), '/');
+
+            if ($storeUrl === '') {
+                return back()->with('error', 'Enter your store URL first.');
+            }
+
+            try {
+                $response = Http::withBasicAuth(
+                    (string) $request->input('consumer_key', ''),
+                    (string) $request->input('consumer_secret', ''),
+                )
+                    ->timeout(30)
+                    ->get($storeUrl.'/wp-json/wc/v3/products', ['per_page' => 1]);
+            } catch (\Throwable $e) {
+                return back()->with('error', 'Could not reach your store. Check the store URL is correct and reachable.');
+            }
+
+            if ($response->status() === 401 || $response->status() === 403) {
+                return back()->with('error', 'Authentication failed — your Consumer Key or Secret is incorrect. Recreate the WooCommerce REST API key with Read access and re-enter it.');
+            }
+
+            if ($response->ok()) {
+                return back()->with('success', 'Connection successful — your WooCommerce credentials work.');
+            }
+
+            return back()->with('error', 'Unexpected response from your store (HTTP '.$response->status().').');
+        }
+
+        return back()->with('error', 'Connection testing is not available for this integration.');
     }
 
     /**

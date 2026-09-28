@@ -118,6 +118,29 @@ export default function Index({ subscription, plans, usage, limits, currentPlan,
                                     </li>
                                 ))}
                             </ul>
+                            {plan.prospecting && (
+                                <div className="mt-4 pt-3 border-t border-gray-100">
+                                    <p className="text-xs font-semibold text-gray-700 mb-1.5">🎯 Prospecting</p>
+                                    {plan.prospecting.max_campaigns === 0 ? (
+                                        <p className="text-xs text-gray-400">Not included</p>
+                                    ) : (
+                                        <ul className="space-y-1">
+                                            <li className="text-xs text-gray-600 flex justify-between">
+                                                <span>Campaigns</span>
+                                                <span className="font-medium">{plan.prospecting.max_campaigns === null ? 'Unlimited' : plan.prospecting.max_campaigns}</span>
+                                            </li>
+                                            <li className="text-xs text-gray-600 flex justify-between">
+                                                <span>Daily prospects</span>
+                                                <span className="font-medium">{plan.prospecting.max_daily_prospects === null ? 'Unlimited' : plan.prospecting.max_daily_prospects}</span>
+                                            </li>
+                                            <li className="text-xs text-gray-600 flex justify-between">
+                                                <span>Daily outreach</span>
+                                                <span className="font-medium">{plan.prospecting.max_daily_outreach === null ? 'Unlimited' : plan.prospecting.max_daily_outreach}</span>
+                                            </li>
+                                        </ul>
+                                    )}
+                                </div>
+                            )}
                             {!isCurrentPlan && (
                                 <form onSubmit={(e) => { e.preventDefault(); post('/billing/subscribe', { data: { plan_id: plan.id } }); }}>
                                     <button className={`w-full mt-4 px-4 py-2 rounded-xl text-sm font-medium transition-all shadow-md ${isPopular ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-white hover:from-amber-500 hover:to-amber-600' : 'bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800'}`}>

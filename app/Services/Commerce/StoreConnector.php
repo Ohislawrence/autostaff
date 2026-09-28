@@ -121,6 +121,8 @@ class StoreConnector
                 $store->getConfigValue('consumer_key', ''),
                 $store->getConfigValue('consumer_secret', ''),
             )
+            ->timeout(120)
+            ->retry(2, 2000)
             ->get($url, ['search' => $query, 'per_page' => $limit]);
 
         if (! $response->ok()) {
@@ -237,10 +239,21 @@ class StoreConnector
 
     protected function wooProductList($store, int $page, int $perPage): array
     {
-        $response = Http::withBasicAuth(
-            $store->getConfigValue('consumer_key', ''),
-            $store->getConfigValue('consumer_secret', '')
-        )->get($this->baseUrl($store).'/products', ['page' => $page, 'per_page' => $perPage]);
+        try {
+            $response = Http::withBasicAuth(
+                $store->getConfigValue('consumer_key', ''),
+                $store->getConfigValue('consumer_secret', '')
+            )
+                ->timeout(120)
+                ->retry(2, 2000)
+                ->get($this->baseUrl($store).'/products', ['page' => $page, 'per_page' => $perPage]);
+        } catch (\Illuminate\Http\Client\ConnectionException $e) {
+            return ['success' => false, 'error' => 'Could not reach your WooCommerce store. Check that the store URL is correct and reachable.'];
+        }
+
+        if ($response->status() === 401 || $response->status() === 403) {
+            return ['success' => false, 'error' => 'WooCommerce authentication failed. Recreate the REST API key with Read access and re-enter the Consumer Key and Secret.', 'code' => $response->status()];
+        }
 
         if (! $response->ok()) {
             return ['success' => false, 'error' => 'WooCommerce request failed', 'code' => $response->status()];

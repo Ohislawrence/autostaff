@@ -2,10 +2,21 @@ import { Head, usePage, useForm, Link } from '@inertiajs/react';
 import TenantLayout from '@/Layouts/TenantLayout';
 import { useState } from 'react';
 
-export default function Setup({ employee, channels }) {
+export default function Setup({ employee, channels, widget_settings }) {
     const { flash } = usePage().props;
     const { post } = useForm();
     const [copied, setCopied] = useState(null);
+
+    const themeForm = useForm({
+        primary_color: widget_settings?.primary_color || '#4F46E5',
+        greeting: widget_settings?.greeting || '👋 Hi! How can we help you today?',
+        position: widget_settings?.position || 'bottom-right',
+    });
+
+    const saveTheme = (e) => {
+        e.preventDefault();
+        themeForm.post(`/ai-employees/${employee.id}/channels/widget`);
+    };
 
     const toggle = (channelId) => {
         post(`/ai-employees/${employee.id}/channels/toggle`, {
@@ -65,6 +76,65 @@ export default function Setup({ employee, channels }) {
                                 </div>
                                 <code className="text-xs text-green-300 break-all font-mono">{channel.snippet}</code>
                             </div>
+                        )}
+
+                        {/* Widget theme editor */}
+                        {channel.id === 'web_chat' && channel.connected && (
+                            <form onSubmit={saveTheme} className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200 space-y-4">
+                                <h4 className="text-sm font-semibold text-gray-800">🎨 Widget Theme</h4>
+
+                                <div>
+                                    <label className="block text-xs font-medium text-gray-600 mb-1">Primary Colour</label>
+                                    <div className="flex items-center gap-3">
+                                        <input
+                                            type="color"
+                                            value={themeForm.data.primary_color}
+                                            onChange={(e) => themeForm.setData('primary_color', e.target.value)}
+                                            className="h-9 w-12 rounded border border-gray-300 cursor-pointer"
+                                        />
+                                        <input
+                                            type="text"
+                                            value={themeForm.data.primary_color}
+                                            onChange={(e) => themeForm.setData('primary_color', e.target.value)}
+                                            placeholder="#4F46E5"
+                                            className="w-28 px-2 py-1.5 border border-gray-300 rounded-lg text-xs font-mono"
+                                        />
+                                    </div>
+                                    {themeForm.errors.primary_color && (
+                                        <p className="mt-1 text-xs text-red-500">{themeForm.errors.primary_color}</p>
+                                    )}
+                                </div>
+
+                                <div>
+                                    <label className="block text-xs font-medium text-gray-600 mb-1">Greeting Message</label>
+                                    <input
+                                        type="text"
+                                        value={themeForm.data.greeting}
+                                        onChange={(e) => themeForm.setData('greeting', e.target.value)}
+                                        className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-xs"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-xs font-medium text-gray-600 mb-1">Position</label>
+                                    <select
+                                        value={themeForm.data.position}
+                                        onChange={(e) => themeForm.setData('position', e.target.value)}
+                                        className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-xs"
+                                    >
+                                        <option value="bottom-right">Bottom Right</option>
+                                        <option value="bottom-left">Bottom Left</option>
+                                    </select>
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    disabled={themeForm.processing}
+                                    className="px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 disabled:opacity-50"
+                                >
+                                    {themeForm.processing ? 'Saving…' : 'Save Theme'}
+                                </button>
+                            </form>
                         )}
 
                         {/* WhatsApp config */}

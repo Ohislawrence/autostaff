@@ -15,6 +15,7 @@
             <a href="{{ route('frontpage.templates') }}" class="link-underline text-sm font-semibold text-ink-dim transition hover:text-ink">AI Employees</a>
             <a href="{{ route('frontpage.marketplace') }}" class="link-underline text-sm font-semibold text-ink-dim transition hover:text-ink">Plugins</a>
             <a href="{{ route('frontpage.pricing') }}" class="link-underline text-sm font-semibold text-ink-dim transition hover:text-ink">Pricing</a>
+            <a href="{{ route('blog.index') }}" class="link-underline text-sm font-semibold text-ink-dim transition hover:text-ink">Blog</a>
         </nav>
 
         <div class="hidden items-center gap-4 md:flex">
@@ -41,6 +42,7 @@
             <a href="{{ route('frontpage.templates') }}" class="text-sm font-semibold text-ink-dim">AI Employees</a>
             <a href="{{ route('frontpage.marketplace') }}" class="text-sm font-semibold text-ink-dim">Plugins</a>
             <a href="{{ route('frontpage.pricing') }}" class="text-sm font-semibold text-ink-dim">Pricing</a>
+            <a href="{{ route('blog.index') }}" class="text-sm font-semibold text-ink-dim">Blog</a>
             <a href="{{ route('login') }}" class="text-sm font-semibold text-ink-dim">Sign in</a>
             <a href="{{ route('login') }}" class="rounded-full bg-ink px-4 py-2 text-center text-sm font-bold text-bone">Start free</a>
         </nav>

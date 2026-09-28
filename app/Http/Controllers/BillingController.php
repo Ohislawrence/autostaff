@@ -43,6 +43,7 @@ class BillingController extends Controller
                 'usd_price' => $plan->usd_price !== null ? (float) $plan->usd_price : null,
                 'currency' => $plan->currency,
                 'features' => $plan->features,
+                'prospecting' => $plan->prospectingLimits(),
                 'is_active' => $plan->is_active,
                 'display_price' => $price['amount'],
                 'display_currency' => $price['currency'],

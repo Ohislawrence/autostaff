@@ -334,8 +334,22 @@ class TransferToHumanTool extends BaseTool
 
     public function execute(array $parameters): array
     {
+        $conversation = $parameters['_conversation'] ?? null;
+        $reason = $parameters['reason'] ?? 'Customer requested human assistance';
+        $summary = $parameters['summary'] ?? null;
+
+        // Actually flag the conversation for human attention (status -> human_required).
+        if ($conversation) {
+            try {
+                app(\App\Services\ConversationService::class)
+                    ->escalateToHuman($conversation, $reason, $summary);
+            } catch (\Throwable $e) {
+                // A handoff failure shouldn't break the AI's response.
+            }
+        }
+
         return $this->success('Transfer initiated. A human agent will take over.', [
-            'reason' => $parameters['reason'] ?? 'Customer requested human assistance',
+            'reason' => $reason,
             'transfer_initiated' => true,
         ]);
     }

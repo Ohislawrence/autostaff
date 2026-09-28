@@ -7,24 +7,26 @@
 
     <title>@yield('title', 'Nomdal — AI Employees That Run Repetitive Business Work')</title>
     <meta name="description" content="@yield('meta_description', 'Nomdal finds potential customers, qualifies them, and follows up automatically. AI employees that run repetitive business work — on WhatsApp, web, and email.')">
-    <link rel="canonical" href="{{ url()->current() }}">
+    <link rel="canonical" href="@yield('canonical', url()->current())">
 
     {{-- Open Graph --}}
-    <meta property="og:type" content="website">
+    <meta property="og:type" content="@yield('og_type', 'website')">
     <meta property="og:site_name" content="Nomdal">
     <meta property="og:locale" content="en_US">
     <meta property="og:title" content="@yield('title', 'Nomdal — AI Employees That Run Repetitive Business Work')">
     <meta property="og:description" content="@yield('meta_description', 'Nomdal finds potential customers, qualifies them, and follows up automatically. AI employees that run repetitive business work — on WhatsApp, web, and email.')">
-    <meta property="og:url" content="{{ url()->current() }}">
-    <meta property="og:image" content="{{ url('/images/og-image2.png') }}">
+    <meta property="og:url" content="@yield('og_url', url()->current())">
+    <meta property="og:image" content="@yield('og_image', url('/images/og-image2.png'))">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
 
     {{-- Twitter --}}
-    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:card" content="@yield('twitter_card', 'summary_large_image')">
     <meta name="twitter:title" content="@yield('title', 'Nomdal — AI Employees That Run Repetitive Business Work')">
     <meta name="twitter:description" content="@yield('meta_description', 'Nomdal finds potential customers, qualifies them, and follows up automatically. AI employees that run repetitive business work — on WhatsApp, web, and email.')">
-    <meta name="twitter:image" content="{{ url('/images/og-image2.png') }}">
+    <meta name="twitter:image" content="@yield('og_image', url('/images/og-image2.png'))">
+
+    @stack('head')
 
     <meta name="theme-color" content="#e8ebff">
 

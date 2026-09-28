@@ -61,6 +61,22 @@ class ChatController extends Controller
             $request->channel_conversation_id
         );
 
+        // Human handoff: once a human is handling this conversation, route the
+        // visitor's message to the team instead of running the AI again.
+        if (in_array($conversation->status, ['human_required', 'assigned', 'waiting_customer'], true)) {
+            $this->conversationService->createIncomingMessage($conversation, $customer, $request->message, [
+                'channel' => $request->channel ?? 'web_chat',
+                'source' => 'chat_widget',
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'response' => 'Your message has been sent to our team — a human agent will get back to you shortly.',
+                'conversation_id' => $conversation->uuid,
+                'human_handled' => true,
+            ]);
+        }
+
         // Create the incoming message record first (this is the event that triggers automations)
         $incomingMessage = $this->conversationService->createIncomingMessage(
             $conversation,
@@ -105,6 +121,45 @@ class ChatController extends Controller
             'conversation_id' => $conversation->uuid,
             'tool_calls' => $result['tool_calls'] ?? [],
             'escalated' => $result['escalated'] ?? false,
+        ]);
+    }
+
+    /**
+     * Poll for new human messages on a conversation (used by the chat widget so
+     * the visitor sees human replies in real time after a handoff).
+     */
+    public function pollConversation(Request $request, AiEmployee $aiEmployee, string $conversationUuid)
+    {
+        $organization = $aiEmployee->organization;
+
+        $conversation = \App\Models\Conversation::where('organization_id', $organization->id)
+            ->where('uuid', $conversationUuid)
+            ->first();
+
+        if (! $conversation) {
+            return response()->json(['success' => false, 'error' => 'Conversation not found.'], 404);
+        }
+
+        $afterId = (int) $request->query('after_id', 0);
+
+        $messages = $conversation->messages()
+            ->where('type', 'human_response')
+            ->when($afterId > 0, fn ($q) => $q->where('id', '>', $afterId))
+            ->orderBy('id')
+            ->get(['id', 'type', 'content', 'created_at'])
+            ->map(fn ($m) => [
+                'id' => $m->id,
+                'type' => $m->type,
+                'content' => $m->content,
+                'created_at' => $m->created_at?->toISOString(),
+            ])
+            ->values();
+
+        return response()->json([
+            'success' => true,
+            'status' => $conversation->status,
+            'messages' => $messages,
+            'last_id' => $messages->last()['id'] ?? $afterId,
         ]);
     }
 }

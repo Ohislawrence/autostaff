@@ -31,6 +31,12 @@ return Application::configure(basePath: dirname(__DIR__))
             'plugin.scope' => \App\Http\Middleware\CheckApiKeyScope::class,
             'plugin.signature' => \App\Http\Middleware\VerifyPluginSignature::class,
         ]);
+
+        // The public chat widget endpoint is exempt from CSRF (called cross-origin
+        // by embedded widgets without a session token).
+        $middleware->validateCsrfTokens(except: [
+            'chat/*',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

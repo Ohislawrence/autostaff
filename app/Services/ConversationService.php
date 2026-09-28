@@ -70,19 +70,25 @@ class ConversationService
         string $channel,
         ?string $channelConversationId = null
     ): Conversation {
-        // Look for an open conversation on this channel for this customer
+        // Look for an active conversation on this channel for this customer.
+        // Human-owned conversations (human_required / assigned / waiting_customer)
+        // are included so a live handoff keeps routing to the same thread.
         $conversation = Conversation::where('organization_id', $organization->id)
             ->where('customer_id', $customer->id)
             ->where('channel', $channel)
-            ->whereIn('status', ['open', 'ai_handling', 'waiting_customer'])
+            ->whereIn('status', ['open', 'ai_handling', 'waiting_customer', 'human_required', 'assigned'])
             ->latest()
             ->first();
 
         if ($conversation) {
+            $humanOwned = in_array($conversation->status, ['human_required', 'assigned', 'waiting_customer'], true);
+
             $conversation->update([
                 'ai_employee_id' => $employee->id,
-                'status' => 'ai_handling',
+                // Preserve human-handoff state; otherwise resume AI handling.
+                'status' => $humanOwned ? $conversation->status : 'ai_handling',
             ]);
+
             return $conversation;
         }
 
@@ -208,7 +214,7 @@ class ConversationService
         }
 
         // Check for explicit human request
-        $humanRequests = ['talk to human', 'speak to human', 'real person', 'human agent', 'not a bot'];
+        $humanRequests = ['talk to human', 'speak to human', 'talk to a human', 'speak to a human', 'real person', 'human agent', 'not a bot'];
         $msg = strtolower($customerMessage);
         foreach ($humanRequests as $phrase) {
             if (str_contains($msg, $phrase)) {

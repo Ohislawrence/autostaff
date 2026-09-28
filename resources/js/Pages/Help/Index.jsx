@@ -145,9 +145,17 @@ const sections = [
 
                 <h4 className="font-semibold text-gray-900 mt-4">Other Integrations</h4>
                 <ul className="list-disc list-inside space-y-1 text-sm">
-                    <li><strong>REST API</strong> — Integrate programmatically with your systems.</li>
+                    <li><strong>WooCommerce</strong> — Connect your store for product-aware AI (see the WooCommerce Integration section).</li>
+                    <li><strong>Shopify</strong> — Connect your Shopify store (see the Shopify Add-on section).</li>
+                    <li><strong>WordPress</strong> — Sync leads &amp; WooCommerce orders with the Nomdal Connect plugin.</li>
+                    <li><strong>REST API</strong> — Integrate programmatically with scoped API keys.</li>
                     <li><strong>Webhooks</strong> — Receive real-time event notifications.</li>
+                    <li><strong>MCP Tools</strong> — Connect Gmail, Calendar, CRM and other external tools.</li>
                 </ul>
+
+                <div className="bg-primary-50 border border-primary-100 rounded-xl p-4 mt-4">
+                    <p className="text-sm text-primary-800">🎨 <strong>Theme your chat widget:</strong> on the Web Chat channel, use the <strong>Widget Theme</strong> panel to set the colour, greeting, and position — the embed code updates automatically.</p>
+                </div>
             </div>
         ),
     },
@@ -535,6 +543,46 @@ const sections = [
         ),
     },
     {
+        id: 'woocommerce',
+        title: 'WooCommerce Integration',
+        icon: '🛒',
+        content: (
+            <div className="space-y-5">
+                <p className="text-gray-700">Connect your WooCommerce store so your AI can search your live catalogue, answer product and pricing questions, and keep orders in sync.</p>
+
+                <div className="bg-primary-50 border border-primary-100 rounded-xl p-5">
+                    <h3 className="font-bold text-primary-800 text-lg mb-3">🔌 Connect your store</h3>
+                    <ol className="list-decimal list-inside space-y-3 text-sm text-gray-700">
+                        <li><strong>Create a WooCommerce REST key</strong> → In WordPress, go to <strong>WooCommerce → Settings → Advanced → REST API</strong> and create a key with <strong>Read</strong> access. Save the Consumer Key and Consumer Secret.</li>
+                        <li><strong>Connect in Nomdal</strong> → Go to <strong>Integrations → WooCommerce</strong>, enter your store URL, Consumer Key and Consumer Secret. The Webhook Secret is optional. Click <strong>Connect</strong>.</li>
+                        <li><strong>Sync products</strong> → Click <strong>Sync Products</strong> to import your catalogue into Nomdal.</li>
+                    </ol>
+                </div>
+
+                <div className="bg-gray-50 border border-gray-200 rounded-xl p-5">
+                    <h3 className="font-bold text-gray-900 text-lg mb-3">🔄 Set up webhooks (keep it in sync)</h3>
+                    <ol className="list-decimal list-inside space-y-2 text-sm text-gray-700">
+                        <li>In WooCommerce, go to <strong>Settings → Advanced → Webhooks → Add webhook</strong>.</li>
+                        <li>Set the <strong>Delivery URL</strong> to <code className="bg-gray-200 px-1 rounded text-xs">https://your-nomdal-domain.com/api/v1/webhooks/woocommerce</code>.</li>
+                        <li>Set <strong>Topic</strong> to <strong>Product updated</strong> (add <strong>Product created</strong> and <strong>Order updated</strong> to keep everything in sync).</li>
+                        <li>If you set a Webhook Secret in Nomdal, enter the same value in the webhook's <strong>Secret</strong> field.</li>
+                    </ol>
+                </div>
+
+                <h3 className="font-bold text-gray-900 text-lg">🧠 Let your AI use your products</h3>
+                <ol className="list-decimal list-inside space-y-2 text-sm text-gray-700">
+                    <li>Go to <strong>AI Employees → [employee] → Edit</strong>.</li>
+                    <li>Enable the <strong>search_store</strong> tool (or <strong>search_products</strong> / <strong>get_price</strong> / <strong>check_inventory</strong> if you keep products in Nomdal's catalogue).</li>
+                    <li>Save — your AI can now answer questions like "is there a discount on this?" using live store data.</li>
+                </ol>
+
+                <div className="bg-amber-50 border border-amber-100 rounded-xl p-4">
+                    <p className="text-sm text-amber-800">💡 <strong>Tip:</strong> Product updates flow automatically through webhooks, so prices and stock stay current without manual re-syncs.</p>
+                </div>
+            </div>
+        ),
+    },
+    {
         id: 'sales-development-rep',
         title: 'Sales Development Rep',
         icon: '🎯',
@@ -675,7 +723,7 @@ const sections = [
                 </div>
                 <div>
                     <h4 className="font-semibold text-gray-900">How do I embed the chat widget on my website?</h4>
-                    <p className="text-sm text-gray-600 mt-1">Go to AI Employees → click <strong>Channels</strong> on any employee → toggle Web Chat ON → copy the snippet → paste before <code className="bg-gray-100 px-1 rounded text-xs">{'</body>'}</code> on your site.</p>
+                    <p className="text-sm text-gray-600 mt-1">Go to <strong>AI Employees → Channels</strong>, toggle <strong>Web Chat</strong> ON, then copy the snippet and paste it just before <code className="bg-gray-100 px-1 rounded text-xs">{'</body>'}</code> on your site. Use the <strong>Widget Theme</strong> panel to set the colour, greeting, and position before copying. The widget keeps the conversation going across page refreshes (for 1 hour by default).</p>
                 </div>
                 <div>
                     <h4 className="font-semibold text-gray-900">What happens when the AI can't answer?</h4>

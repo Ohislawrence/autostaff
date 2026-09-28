@@ -20,7 +20,7 @@ class Organization extends Model
         'website', 'email', 'phone', 'address', 'city', 'state', 'country',
         'timezone', 'currency', 'business_hours', 'holidays', 'policies',
         'onboarding_step', 'onboarding_completed', 'is_active', 'trial_ends_at',
-        'monthly_ai_budget_cents',
+        'monthly_ai_budget_cents', 'report_alerts',
     ];
 
     protected $casts = [
@@ -30,6 +30,7 @@ class Organization extends Model
         'is_active' => 'boolean',
         'onboarding_completed' => 'boolean',
         'trial_ends_at' => 'datetime',
+        'report_alerts' => 'array',
     ];
 
     protected static function booted(): void

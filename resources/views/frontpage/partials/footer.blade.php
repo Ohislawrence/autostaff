@@ -24,6 +24,7 @@
                 <ul class="mt-4 space-y-3 text-sm text-ink-dim">
                     <li><a href="{{ route('frontpage.about') }}" class="link-underline hover:text-ink">About</a></li>
                     <li><a href="{{ route('frontpage.contact') }}" class="link-underline hover:text-ink">Contact</a></li>
+                    <li><a href="{{ route('blog.index') }}" class="link-underline hover:text-ink">Blog</a></li>
                 </ul>
             </div>
             <div>

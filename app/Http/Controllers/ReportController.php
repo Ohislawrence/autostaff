@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\GeneratedReport;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class ReportController extends Controller
@@ -25,6 +26,32 @@ class ReportController extends Controller
             ])
             ->values();
 
-        return Inertia::render('Reports/Index', ['reports' => $reports]);
+        return Inertia::render('Reports/Index', [
+            'reports' => $reports,
+            'report_alerts' => $organization->report_alerts ?? ['enabled' => false, 'frequency' => 'weekly', 'recipients' => []],
+        ]);
+    }
+
+    public function saveAlerts(Request $request)
+    {
+        $organization = current_org();
+
+        $validated = $request->validate([
+            'enabled' => 'boolean',
+            'frequency' => 'nullable|in:daily,weekly,monthly',
+            'email' => 'nullable|email',
+        ]);
+
+        $alerts = $organization->report_alerts ?? [];
+        $alerts['enabled'] = (bool) ($validated['enabled'] ?? false);
+        $alerts['frequency'] = $validated['frequency'] ?? 'weekly';
+        $alerts['recipients'] = [];
+        if (! empty($validated['email'])) {
+            $alerts['recipients'] = [$validated['email']];
+        }
+
+        $organization->update(['report_alerts' => $alerts]);
+
+        return back()->with('success', 'Report alert preferences saved.');
     }
 }

@@ -1,7 +1,7 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 
 const sidebar = [
-    { section: 'PLATFORM', items: [{ name: 'Dashboard', href: '/platform', icon: '📊' },{ name: 'Organizations', href: '/platform/tenants', icon: '🏢' },{ name: 'Users', href: '/platform/users', icon: '👥' },{ name: 'Subscriptions', href: '/platform/plans', icon: '💳' },{ name: 'Plugins', href: '/platform/plugins', icon: '🧩' }] },
+    { section: 'PLATFORM', items: [{ name: 'Dashboard', href: '/platform', icon: '📊' },{ name: 'Organizations', href: '/platform/tenants', icon: '🏢' },{ name: 'Users', href: '/platform/users', icon: '👥' },{ name: 'Subscriptions', href: '/platform/plans', icon: '💳' },{ name: 'Plugins', href: '/platform/plugins', icon: '🧩' },{ name: 'Blog', href: '/platform/blog', icon: '📝' }] },
     { section: 'GROWTH', items: [{ name: 'Prospecting', href: '/platform/prospecting', icon: '🎯' },{ name: 'Prospecting Settings', href: '/platform/prospecting/settings', icon: '🛠️' },{ name: 'Suppression List', href: '/platform/prospecting/suppression', icon: '🚫' }] },
     { section: 'OPERATOR', items: [{ name: 'Marketing', href: '/platform/marketing', icon: '📣' },{ name: 'Daily Tasks', href: '/platform/tasks', icon: '✅' },{ name: 'Achievements', href: '/platform/achievements', icon: '🏆' },{ name: 'Goals', href: '/platform/goals', icon: '🎯' }] },
     { section: 'AI PLATFORM', items: [{ name: 'Providers', href: '/platform/providers', icon: '🔌' },{ name: 'Models', href: '/platform/models', icon: '🧠' },{ name: 'Templates', href: '/platform/templates', icon: '📋' },{ name: 'Tools', href: '/platform/tools', icon: '🔧' },{ name: 'Feature Flags', href: '/platform/features', icon: '🚩' }] },
