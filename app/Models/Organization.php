@@ -21,6 +21,7 @@ class Organization extends Model
         'timezone', 'currency', 'business_hours', 'holidays', 'policies',
         'onboarding_step', 'onboarding_completed', 'is_active', 'trial_ends_at',
         'monthly_ai_budget_cents', 'report_alerts',
+        'affiliate_network', 'affiliate_click_id', 'affiliate_sub_id', 'affiliate_referrer',
     ];
 
     protected $casts = [

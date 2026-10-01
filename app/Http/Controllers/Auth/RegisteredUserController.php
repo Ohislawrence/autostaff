@@ -48,6 +48,7 @@ class RegisteredUserController extends Controller
         $organization = Organization::create([
             'name' => $orgName,
             'slug' => Str::slug($orgName) . '-' . Str::random(4),
+            'email' => $validated['email'],
             'onboarding_step' => 'configure_profile',
             'onboarding_completed' => false,
             'is_active' => true,
@@ -58,11 +59,28 @@ class RegisteredUserController extends Controller
             'is_owner' => true,
         ]);
 
+        // Attribute any affiliate click (e.g. ClicksIntel) to this signup.
+        try {
+            app(\App\Services\Affiliate\AffiliateTrackingService::class)->attributeOrganization($organization, $request);
+        } catch (\Throwable $e) {
+            // Never block signup if attribution fails.
+        }
+
         // Start on the Free plan (no payment required).
         try {
             app(\App\Services\Billing\SubscriptionService::class)->subscribeFree($organization);
         } catch (\Throwable $e) {
             // Never block signup if the Free plan isn't available.
+        }
+
+        // Optionally report a signup conversion (if configured to convert on signup).
+        try {
+            $affiliate = app(\App\Services\Affiliate\AffiliateTrackingService::class);
+            if ($affiliate->shouldReportSignup()) {
+                $affiliate->reportConversion($organization, 'signup');
+            }
+        } catch (\Throwable $e) {
+            // Never block signup if conversion reporting fails.
         }
 
         Auth::login($user);

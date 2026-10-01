@@ -122,6 +122,16 @@ export default function Index({ employees }) {
                                     <span>👥 {employee.prospects_count || 0} prospects</span>
                                 </div>
 
+                                {!employee.connected && (
+                                    <div className="mb-4 flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5">
+                                        <span className="mt-0.5 text-sm leading-none">⚠️</span>
+                                        <p className="text-xs text-amber-800">
+                                            <span className="font-semibold">Not connected to any app yet.</span>{' '}
+                                            <Link href="/help#channels" className="font-semibold underline hover:text-amber-900">See how to connect it</Link> to web chat, WhatsApp, or email.
+                                        </p>
+                                    </div>
+                                )}
+
                                 <div className="flex items-center gap-2 pt-3 border-t border-gray-100">
                                     <button
                                         onClick={() => post(`/ai-employees/${employee.id}/toggle`)}

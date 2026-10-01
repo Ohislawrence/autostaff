@@ -152,12 +152,17 @@ class WorkforceService
 
     protected function signals(Organization $organization): array
     {
-        $haystack = strtolower(implode(' ', array_filter([
-            $organization->industry,
-            $organization->description,
-            $organization->policies['offering'] ?? null,
-            $organization->policies['icp']['industry'] ?? null,
-        ])));
+        $policies = is_array($organization->policies) ? $organization->policies : [];
+
+        $haystack = strtolower(implode(' ', array_filter(array_map(
+            fn ($value) => $this->flattenToText($value),
+            [
+                $organization->industry,
+                $organization->description,
+                $policies['offering'] ?? null,
+                $policies['icp']['industry'] ?? null,
+            ],
+        ))));
 
         $contains = fn (array $words) => (bool) array_filter($words, fn ($w) => str_contains($haystack, $w));
 
@@ -168,5 +173,38 @@ class WorkforceService
             'technical' => $contains(['saas', 'software', 'tech', 'it ', 'hosting', 'app', 'platform', 'digital']),
             'lead_heavy' => $contains(['lead', 'b2b', 'agency', 'consult', 'professional']),
         ];
+    }
+
+    /**
+     * Normalize a value (string, scalar, or nested array) into a single
+     * searchable string, or null when empty. Prevents "Array to string
+     * conversion" when a policies field (e.g. icp.industry) is an array.
+     */
+    protected function flattenToText(mixed $value): ?string
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        if (is_string($value)) {
+            return $value;
+        }
+
+        if (is_scalar($value)) {
+            return (string) $value;
+        }
+
+        if (is_array($value)) {
+            $flat = [];
+            array_walk_recursive($value, function ($item) use (&$flat) {
+                if ($item !== null && $item !== '' && is_scalar($item)) {
+                    $flat[] = (string) $item;
+                }
+            });
+
+            return $flat === [] ? null : implode(' ', $flat);
+        }
+
+        return null;
     }
 }

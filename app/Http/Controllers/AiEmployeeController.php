@@ -16,11 +16,30 @@ class AiEmployeeController extends Controller
         $employees = $organization?->aiEmployees()
             ->withCount(['conversations', 'leads', 'prospectingCampaigns as campaigns_count', 'prospects as prospects_count'])
             ->latest()
-            ->get() ?? collect();
+            ->get()
+            ->map(fn (AiEmployee $employee) => array_merge($employee->toArray(), [
+                'connected' => $this->isEmployeeConnected($employee),
+            ]))
+            ->values() ?? collect();
 
         return Inertia::render('AiEmployees/Index', [
             'employees' => $employees,
         ]);
+    }
+
+    /**
+     * An AI employee counts as "connected" when it has at least one real
+     * channel configured (WhatsApp/Email — web_chat is on by default) or has
+     * already received conversations (i.e. it is actually live somewhere).
+     */
+    protected function isEmployeeConnected(AiEmployee $employee): bool
+    {
+        $channels = $employee->allowed_channels ?? [];
+
+        $hasRealChannel = count(array_intersect($channels, ['whatsapp', 'email'])) > 0;
+        $hasConversations = (int) ($employee->conversations_count ?? 0) > 0;
+
+        return $hasRealChannel || $hasConversations;
     }
 
     public function create()

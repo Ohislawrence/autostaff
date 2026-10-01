@@ -28,6 +28,20 @@ class FirstCustomerService
         'transfer_to_human',
     ];
 
+    protected const INBOUND_TOOLS = [
+        'create_lead',
+        'create_customer',
+        'get_customer',
+        'create_order',
+        'get_order',
+        'get_order_status',
+        'search_products',
+        'get_product',
+        'get_price',
+        'check_inventory',
+        'transfer_to_human',
+    ];
+
     public function launch(Organization $organization, array $input): array
     {
         // 1. Create the AI Sales Employee (SDR).
@@ -89,15 +103,57 @@ class FirstCustomerService
             'is_active' => true,
         ]);
 
-        $this->syncTools($employee);
+        $this->syncTools($employee, self::SDR_TOOLS);
 
         return $employee;
     }
 
-    protected function syncTools(AiEmployee $employee): void
+    /**
+     * Create an inbound AI sales assistant (no prospecting) for plans that do
+     * not include the outbound Prospecting engine (Free/Starter).
+     */
+    public function launchInbound(Organization $organization, array $input): AiEmployee
     {
+        $name = $input['employee_name'] ?? 'Alex — Sales Assistant';
+
+        $employee = $organization->aiEmployees()->create([
+            'uuid' => (string) Str::uuid(),
+            'name' => $name,
+            'role' => 'Sales Assistant',
+            'department' => 'revenue',
+            'description' => 'AI sales assistant that answers questions, captures leads, and helps customers on web chat and WhatsApp.',
+            'avatar' => '💬',
+            'personality' => 'Friendly, helpful, and concise.',
+            'tone' => 'professional',
+            'language' => 'en',
+            'system_instructions' => $this->inboundInstructions($organization, $input),
+            'enabled_tools' => self::INBOUND_TOOLS,
+            'is_active' => true,
+        ]);
+
+        $this->syncTools($employee, self::INBOUND_TOOLS);
+
+        return $employee;
+    }
+
+    protected function inboundInstructions(Organization $organization, array $input): string
+    {
+        $offering = $input['offering'] ?? 'our product/service';
+
+        return "You are {$organization->name}'s AI sales assistant. "
+            . 'Your job is to help visitors and customers: answer questions about what we offer, capture leads, and help with orders. '
+            . "What we sell: {$offering}. "
+            . 'Be friendly, concise, and only claim what you know. If you cannot help, hand the conversation to a human.';
+    }
+
+    protected function syncTools(AiEmployee $employee, array $identifiers): void
+    {
+        if (empty($identifiers)) {
+            return;
+        }
+
         $toolIds = Tool::where('is_active', true)
-            ->whereIn('identifier', self::SDR_TOOLS)
+            ->whereIn('identifier', $identifiers)
             ->pluck('id');
 
         $employee->tools()->sync(

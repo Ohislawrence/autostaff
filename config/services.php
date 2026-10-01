@@ -76,4 +76,29 @@ return [
         'ngn_to_usd' => (float) env('NGN_TO_USD_RATE', 1500),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | ClicksIntel — Affiliate Network (CPA conversion tracking)
+    |--------------------------------------------------------------------------
+    |
+    | Nomdal is promoted as an offer on the ClicksIntel affiliate network.
+    | Affiliates send traffic through a ClicksIntel tracking link; Nomdal
+    | captures the click id, attributes it to the signup, and fires a
+    | server-to-server postback back to ClicksIntel when a paid plan is
+    | activated (or on signup, if configured).
+    |
+    */
+    'clicksintel' => [
+        'enabled' => env('CLICKSINTEL_ENABLED', false),
+        'postback_url' => env('CLICKSINTEL_POSTBACK_URL'),
+        'click_param' => env('CLICKSINTEL_CLICK_PARAM', 'click_id'),
+        'sub_param' => env('CLICKSINTEL_SUB_PARAM', 'sub_id'),
+        'transaction_param' => env('CLICKSINTEL_TRANSACTION_PARAM', 'txn_id'),
+        'cookie_name' => env('CLICKSINTEL_COOKIE_NAME', 'ci_click'),
+        'cookie_ttl_days' => (int) env('CLICKSINTEL_COOKIE_TTL_DAYS', 30),
+        'conversion_event' => env('CLICKSINTEL_CONVERSION_EVENT', 'paid_subscription'),
+        'payout_amount' => (float) env('CLICKSINTEL_PAYOUT_AMOUNT', 0),
+        'payout_currency' => env('CLICKSINTEL_PAYOUT_CURRENCY', 'NGN'),
+    ],
+
 ];

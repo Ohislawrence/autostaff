@@ -784,7 +784,11 @@ function CheckItem({ text }) {
 }
 
 export default function HelpIndex() {
-    const [activeSection, setActiveSection] = useState('getting-started');
+    const [activeSection, setActiveSection] = useState(() => {
+        if (typeof window === 'undefined') return 'getting-started';
+        const hash = window.location.hash.replace('#', '');
+        return sections.some(s => s.id === hash) ? hash : 'getting-started';
+    });
 
     const current = sections.find(s => s.id === activeSection);
 

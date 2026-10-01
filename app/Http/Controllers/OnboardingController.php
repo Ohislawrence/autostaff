@@ -32,12 +32,12 @@ class OnboardingController extends Controller
         if (! $organization) {
             return Inertia::render('Onboarding/Wizard', [
                 'step' => 'create_org',
-                'steps' => array_values(array_map(fn ($key, $s) => [
-                    'key' => $key,
-                    'label' => $s['label'],
-                ], array_keys(self::STEPS), self::STEPS)),
+                'steps' => $this->stepsFor(null),
                 'organization' => null,
                 'aiEmployee' => null,
+                'userEmail' => $user->email,
+                'canUseProspecting' => false,
+                'planName' => 'Free',
             ]);
         }
 
@@ -65,10 +65,7 @@ class OnboardingController extends Controller
 
         return Inertia::render('Onboarding/Wizard', [
             'step' => $currentStep,
-            'steps' => array_values(array_map(fn ($key, $s) => [
-                'key' => $key,
-                'label' => $s['label'],
-            ], array_keys(self::STEPS), self::STEPS)),
+            'steps' => $this->stepsFor($organization),
             'organization' => [
                 'id' => $organization->id,
                 'name' => $organization->name,
@@ -98,7 +95,28 @@ class OnboardingController extends Controller
                 'name' => $campaign->name,
             ] : null,
             'prospects' => $prospects->values(),
+            'userEmail' => $user->email,
+            'canUseProspecting' => app(\App\Services\Prospecting\ProspectingPlanGate::class)->isAllowed($organization),
+            'planName' => $organization->activePlan()?->name ?? 'Free',
         ]);
+    }
+
+    /**
+     * Build the ordered step list. Users who registered already created their
+     * organization, so the "Create Organization" step is skipped for them.
+     */
+    protected function stepsFor(?Organization $organization): array
+    {
+        $steps = self::STEPS;
+
+        if ($organization) {
+            unset($steps['create_org']);
+        }
+
+        return array_values(array_map(fn ($key, $s) => [
+            'key' => $key,
+            'label' => $s['label'],
+        ], array_keys($steps), $steps));
     }
 
     /**
@@ -186,6 +204,7 @@ class OnboardingController extends Controller
                 'offering' => $validated['offering'],
                 'price_point' => $validated['price_point'] ?? null,
             ]),
+            'description' => $validated['offering'],
             'onboarding_step' => 'icp',
         ]);
 
@@ -240,16 +259,31 @@ class OnboardingController extends Controller
 
         $policies = $organization->policies ?? [];
 
-        app(\App\Services\Onboarding\FirstCustomerService::class)->launch($organization, [
+        $input = [
             'employee_name' => $validated['employee_name'] ?? null,
             'offering' => $policies['offering'] ?? null,
             'price_point' => $policies['price_point'] ?? null,
             'icp' => $policies['icp'] ?? [],
-        ]);
+        ];
 
-        $organization->update([
-            'onboarding_step' => 'results',
-        ]);
+        $gate = app(\App\Services\Prospecting\ProspectingPlanGate::class);
+
+        if ($gate->isAllowed($organization)) {
+            app(\App\Services\Onboarding\FirstCustomerService::class)->launch($organization, $input);
+
+            $organization->update([
+                'onboarding_step' => 'results',
+            ]);
+        } else {
+            // Free/Starter: automated prospecting is not included, so create an
+            // inbound sales assistant and complete onboarding instead.
+            app(\App\Services\Onboarding\FirstCustomerService::class)->launchInbound($organization, $input);
+
+            $organization->update([
+                'onboarding_step' => 'complete',
+                'onboarding_completed' => true,
+            ]);
+        }
 
         return redirect()->route('onboarding.show');
     }

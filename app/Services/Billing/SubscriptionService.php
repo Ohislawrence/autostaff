@@ -61,6 +61,13 @@ class SubscriptionService
             ]);
         }
 
+        $this->reportAffiliateConversion(
+            $organization,
+            $plan,
+            $total,
+            $providerData['currency'] ?? 'NGN',
+        );
+
         return $subscription;
     }
 
@@ -129,6 +136,13 @@ class SubscriptionService
             ]);
         }
 
+        $this->reportAffiliateConversion(
+            $organization,
+            $plan,
+            (float) ($pending->provider_data['total'] ?? 0),
+            $pending->provider_data['currency'] ?? 'NGN',
+        );
+
         return $pending;
     }
 
@@ -188,6 +202,10 @@ class SubscriptionService
             if ($organization) {
                 $organization->subscriptions()->where('status', 'active')->update(['status' => 'cancelled', 'cancelled_at' => now()]);
                 $subscription->update(['status' => 'active', 'provider' => 'manual', 'starts_at' => now(), 'ends_at' => now()->addMonth()]);
+
+                if ($subscription->plan && $subscription->plan->slug !== 'free') {
+                    $this->reportAffiliateConversion($organization, $subscription->plan, (float) $invoice->total, $invoice->currency);
+                }
             }
         }
 
@@ -231,5 +249,27 @@ class SubscriptionService
             $pending->provider_data['currency'] ?? 'NGN',
             $error,
         );
+    }
+
+    /**
+     * Fire an affiliate conversion (e.g. ClicksIntel postback) when a paid
+     * plan is activated. Never throws — attribution/reporting must not block
+     * a successful subscription activation.
+     */
+    protected function reportAffiliateConversion(Organization $organization, Plan $plan, float $total, string $currency): void
+    {
+        if ($plan->slug === 'free' || $total <= 0) {
+            return;
+        }
+
+        try {
+            app(\App\Services\Affiliate\AffiliateTrackingService::class)
+                ->reportConversion($organization, 'paid_subscription', $plan, $total, $currency);
+        } catch (\Throwable $e) {
+            Log::warning('Affiliate conversion report failed', [
+                'organization_id' => $organization->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 }
